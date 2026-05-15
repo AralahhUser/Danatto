@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  owner
+  manager
+}
+
+enum ProductStatus {
+  disponible
+  vendido
+  reservado
+  oculto
+}
+
+enum GarmentCondition {
+  nuevo_sin_etiqueta
+  excelente
+  muy_bueno
+  bueno
+  con_detalles
+}
+
+enum Gender {
+  hombre
+  mujer
+  unisex
+}
+
+enum PaymentStatus {
+  pendiente
+  pagado
+  fallido
+  reembolsado
+}
+
+enum ShippingStatus {
+  pendiente
+  en_preparacion
+  enviado
+  entregado
+  cancelado
+}
+
+enum DiscountType {
+  porcentaje
+  monto_fijo
+}
+
+model UserAdmin {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(manager)
+  createdAt    DateTime  @default(now())
+}
+
+model Product {
+  id            String           @id @default(cuid())
+  name          String
+  slug          String           @unique
+  description   String
+  price         Decimal          @db.Decimal(10, 2)
+  salePrice     Decimal?         @db.Decimal(10, 2)
+  brandId       String
+  categoryId    String
+  images        String[]
+  size          String
+  color         String
+  gender        Gender
+  condition     GarmentCondition
+  measurements  Json
+  observations  String?
+  stock         Int              @default(1)
+  status        ProductStatus    @default(disponible)
+  isFeatured    Boolean          @default(false)
+  isNewArrival  Boolean          @default(false)
+  isUniquePiece Boolean          @default(true)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  brand         Brand            @relation(fields: [brandId], references: [id])
+  category      Category         @relation(fields: [categoryId], references: [id])
+  orderItems    OrderItem[]
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Brand {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  logoUrl  String?
+  products Product[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  address   String
+  district  String
+  city      String
+  reference String?
+  createdAt DateTime @default(now())
+  orders    Order[]
+
+  @@index([email])
+}
+
+model Order {
+  id               String         @id @default(cuid())
+  customerId       String
+  total            Decimal        @db.Decimal(10, 2)
+  shippingCost     Decimal        @db.Decimal(10, 2)
+  paymentStatus    PaymentStatus  @default(pendiente)
+  shippingStatus   ShippingStatus @default(pendiente)
+  paymentProvider  String
+  paymentReference String?
+  createdAt        DateTime       @default(now())
+  customer         Customer       @relation(fields: [customerId], references: [id])
+  items            OrderItem[]
+
+  @@index([customerId])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  discountType  DiscountType
+  discountValue Decimal      @db.Decimal(10, 2)
+  expiresAt     DateTime?
+  active        Boolean      @default(true)
+}
+
+model Banner {
+  id         String  @id @default(cuid())
+  title      String
+  subtitle   String?
+  imageUrl   String
+  buttonText String?
+  buttonLink String?
+  active     Boolean @default(true)
+}
