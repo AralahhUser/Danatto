@@ -2,18 +2,8 @@
   "name": "danatto-store",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@11.1.1",
   "engines": {
     "node": ">=22.13"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@prisma/client",
-      "@prisma/engines",
-      "prisma",
-      "sharp",
-      "unrs-resolver"
-    ]
   },
   "scripts": {
     "dev": "next dev",

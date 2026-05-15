@@ -46,15 +46,15 @@ Tienda online premium para ropa americana seleccionada de segunda mano. Incluye 
 
 ## Instalacion
 
-Requiere Node `>=22.13` y pnpm `11.1.1`.
+Requiere Node `>=22.13`.
 
 ```bash
-pnpm install
+npm install
 cp .env.example .env
-pnpm db:generate
-pnpm db:migrate
-pnpm db:seed
-pnpm dev
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+npm run dev
 ```
 
 Usuario admin de prueba creado por seed:
@@ -128,8 +128,8 @@ El logo oscuro se usa en header y admin; el logo claro se usa en footer.
 ## Verificacion local
 
 ```bash
-pnpm exec tsc --noEmit
-pnpm build
+npm exec tsc --noEmit
+npm run build
 ```
 
 Tambien se recomienda revisar manualmente:
@@ -147,9 +147,9 @@ Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js de
 Comandos recomendados para produccion:
 
 ```bash
-pnpm db:deploy
-pnpm db:seed
-pnpm build
+npm run db:deploy
+npm run db:seed
+npm run build
 ```
 
 ## Notas de personalizacion
