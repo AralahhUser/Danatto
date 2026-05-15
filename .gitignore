@@ -9,3 +9,5 @@ coverage
 prisma/dev.db
 *.tsbuildinfo
 edge-*/
+
+.vercel
