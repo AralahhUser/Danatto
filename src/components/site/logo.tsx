@@ -6,11 +6,11 @@ export function Logo({ tone = "dark", compact = false }: { tone?: "dark" | "ligh
 
   return (
     <Link href="/" className="focus-ring inline-flex flex-col rounded-sm">
-      <span className="relative block h-8 w-[166px] sm:h-9 sm:w-[190px]">
+      <span className="relative block h-7 w-[142px] sm:h-9 sm:w-[190px]">
         <Image src={src} alt="Danatto" fill priority sizes="190px" className="object-contain" />
       </span>
       {!compact ? (
-        <span className={`mt-1 text-[10px] uppercase tracking-[0.24em] ${tone === "light" ? "text-white/55" : "text-ink/45"}`}>
+        <span className={`mt-1 hidden text-[10px] uppercase tracking-[0.24em] sm:block ${tone === "light" ? "text-white/55" : "text-ink/45"}`}>
           Selected clothing
         </span>
       ) : null}

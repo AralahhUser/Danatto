@@ -25,7 +25,7 @@ export function AddToCartButton({ product }: { product: StoreProduct }) {
           stock: product.stock
         })
       }
-      className="focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-sm font-semibold text-white transition hover:bg-navy disabled:cursor-not-allowed disabled:bg-ink/35"
+      className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-navy disabled:cursor-not-allowed disabled:bg-ink/35 sm:py-4"
     >
       <ShoppingBag className="h-5 w-5" />
       {disabled ? "No disponible" : "Agregar al carrito"}

@@ -14,12 +14,14 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
   text-rendering: optimizeLegibility;
 }
 
@@ -34,14 +36,26 @@ textarea {
   font: inherit;
 }
 
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2;
 }
 
 .container-page {
-  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  @apply mx-auto w-full max-w-7xl px-3.5 sm:px-6 lg:px-8;
 }
 
 .section-pad {
-  @apply py-16 sm:py-24;
+  @apply py-10 sm:py-16 lg:py-24;
 }

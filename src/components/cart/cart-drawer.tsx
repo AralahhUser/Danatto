@@ -15,10 +15,10 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <div className="fixed inset-0 z-50 bg-ink/35" onClick={onClose}>
       <aside
-        className="ml-auto flex h-full w-full max-w-md flex-col bg-white shadow-soft"
+        className="ml-auto flex h-full w-[min(100vw,430px)] max-w-none flex-col bg-white shadow-soft sm:max-w-md"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-ink/10 p-5">
+        <div className="flex items-center justify-between gap-4 border-b border-ink/10 p-4 sm:p-5">
           <div>
             <h2 className="text-lg font-semibold">Carrito</h2>
             <p className="text-sm text-ink/55">Piezas seleccionadas para tu pedido.</p>
@@ -27,18 +27,18 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
           {items.length ? (
             <div className="grid gap-4">
               {items.map((item) => (
-                <div key={item.productId} className="grid grid-cols-[84px_1fr] gap-4">
+                <div key={item.productId} className="grid grid-cols-[72px_1fr] gap-3 sm:grid-cols-[84px_1fr] sm:gap-4">
                   <div className="relative aspect-square overflow-hidden rounded-md bg-mist">
                     <Image src={item.image} alt={item.name} fill sizes="84px" className="object-cover" />
                   </div>
                   <div>
                     <div className="flex justify-between gap-3">
                       <div>
-                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm font-semibold leading-snug sm:text-base">{item.name}</p>
                         <p className="text-sm text-ink/55">
                           {item.brand} - Talla {item.size}
                         </p>
@@ -49,11 +49,11 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                     </div>
                     <div className="mt-3 flex items-center justify-between">
                       <div className="inline-flex items-center rounded-full border border-ink/10">
-                        <button className="px-3 py-1" onClick={() => setQuantity(item.productId, item.quantity - 1)}>
+                        <button className="min-h-8 px-3 py-1" onClick={() => setQuantity(item.productId, item.quantity - 1)}>
                           -
                         </button>
                         <span className="px-2 text-sm">{item.quantity}</span>
-                        <button className="px-3 py-1" onClick={() => setQuantity(item.productId, item.quantity + 1)}>
+                        <button className="min-h-8 px-3 py-1" onClick={() => setQuantity(item.productId, item.quantity + 1)}>
                           +
                         </button>
                       </div>
@@ -70,7 +70,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             </div>
           )}
         </div>
-        <div className="border-t border-ink/10 p-5">
+        <div className="border-t border-ink/10 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:p-5">
           <div className="grid gap-2 text-sm">
             <div className="flex justify-between">
               <span>Subtotal</span>
@@ -86,10 +86,10 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             </div>
           </div>
           <div className="mt-5 grid gap-3">
-            <Link onClick={onClose} href="/checkout" className="focus-ring rounded-full bg-ink px-5 py-3 text-center text-sm font-semibold text-white">
+            <Link onClick={onClose} href="/checkout" className="focus-ring min-h-12 rounded-full bg-ink px-5 py-3.5 text-center text-sm font-semibold text-white">
               Finalizar compra
             </Link>
-            <Link onClick={onClose} href="/cart" className="focus-ring rounded-full border border-ink px-5 py-3 text-center text-sm font-semibold">
+            <Link onClick={onClose} href="/cart" className="focus-ring min-h-12 rounded-full border border-ink px-5 py-3.5 text-center text-sm font-semibold">
               Ver carrito
             </Link>
           </div>

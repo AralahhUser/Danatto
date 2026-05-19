@@ -23,7 +23,7 @@ const policies = {
     body: [
       "Cada prenda se clasifica como nuevo sin etiqueta, excelente, muy bueno, bueno o con detalles.",
       "Las observaciones visibles se muestran en la ficha del producto para que la compra sea clara.",
-      "La ropa americana seleccionada puede presentar señales naturales de uso, siempre informadas cuando son relevantes."
+      "La ropa americana seleccionada puede presentar senales naturales de uso, siempre informadas cuando son relevantes."
     ]
   },
   terms: {
@@ -59,15 +59,13 @@ export default async function PolicyPage({ params }: PageProps) {
   if (!content) notFound();
 
   return (
-    <main className="container-page section-pad">
-      <div className="mx-auto max-w-3xl rounded-lg border border-ink/10 bg-white p-6 sm:p-10">
+    <main className="container-page py-8 sm:py-16 lg:py-24">
+      <div className="mx-auto max-w-3xl rounded-lg border border-ink/10 bg-white p-4 sm:p-10">
         <p className="text-sm font-semibold uppercase text-olive">Politicas Danatto</p>
-        <h1 className="mt-3 text-4xl font-semibold">{content.title}</h1>
-        <div className="mt-8 grid gap-5 text-ink/70">
+        <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">{content.title}</h1>
+        <div className="mt-6 grid gap-4 text-sm leading-7 text-ink/70 sm:mt-8 sm:gap-5 sm:text-base sm:leading-8">
           {content.body.map((paragraph) => (
-            <p key={paragraph} className="leading-8">
-              {paragraph}
-            </p>
+            <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
       </div>

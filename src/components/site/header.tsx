@@ -25,21 +25,21 @@ export function Header() {
 
   return (
     <>
-      <div className="border-b border-ink/10 bg-porcelain px-4 py-2 text-center text-[10px] font-semibold uppercase leading-5 tracking-[0.1em] text-ink/55 sm:text-[11px] sm:tracking-[0.18em]">
+      <div className="border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
         <span className="sm:hidden">Piezas unicas revisadas una por una</span>
         <span className="hidden sm:inline">Ropa americana seleccionada - piezas unicas revisadas una por una</span>
       </div>
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-porcelain/90 backdrop-blur-xl">
-        <div className="container-page flex h-24 items-center justify-between gap-4">
+        <div className="container-page flex h-[68px] items-center justify-between gap-2 sm:h-24 sm:gap-4">
           <button
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}
-            className="focus-ring inline-flex h-11 w-11 items-center justify-center rounded-full border border-ink/10 bg-white lg:hidden"
+            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          <Logo />
+          <Logo compact />
 
           <nav className="hidden items-center gap-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/55 lg:flex">
             {nav.map((item) => (
@@ -56,7 +56,7 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/shop"
               aria-label="Buscar productos"
@@ -66,7 +66,7 @@ export function Header() {
             </Link>
             <button
               onClick={() => setCartOpen(true)}
-              className="focus-ring relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-ink text-white transition hover:bg-navy"
+              className="focus-ring relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white transition hover:bg-navy sm:h-11 sm:w-11"
               aria-label="Abrir carrito"
             >
               <ShoppingBag className="h-5 w-5" />
@@ -82,11 +82,11 @@ export function Header() {
         {mobileOpen ? (
           <div className="fixed inset-0 z-50 bg-ink/30 lg:hidden" onClick={() => setMobileOpen(false)}>
             <div
-              className="h-full w-[min(84vw,360px)] bg-porcelain p-5 shadow-soft"
+              className="h-full w-[min(88vw,360px)] overflow-y-auto bg-porcelain p-4 shadow-soft sm:p-5"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="mb-8 flex items-center justify-between">
-                <Logo />
+              <div className="mb-7 flex items-center justify-between">
+                <Logo compact />
                 <button
                   aria-label="Cerrar menu"
                   onClick={() => setMobileOpen(false)}
@@ -101,7 +101,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="rounded-md px-3 py-3 text-base font-semibold text-ink hover:bg-linen"
+                    className="rounded-md px-3 py-3.5 text-base font-semibold text-ink hover:bg-linen"
                   >
                     {item.label}
                   </Link>

@@ -57,3 +57,35 @@ export function AdminSidebar() {
     </aside>
   );
 }
+
+export function AdminMobileNav() {
+  const pathname = usePathname();
+
+  return (
+    <div className="border-b border-ink/10 bg-white lg:hidden">
+      <div className="flex items-center justify-between gap-4 px-4 py-3">
+        <Logo compact />
+        <Link href="/" className="text-xs font-semibold uppercase tracking-[0.14em] text-ink/50">
+          Ver tienda
+        </Link>
+      </div>
+      <nav className="flex gap-2 overflow-x-auto px-4 pb-3">
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={clsx(
+              "inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border px-3 text-sm font-medium transition",
+              pathname.startsWith(link.href)
+                ? "border-navy bg-navy text-white"
+                : "border-ink/10 bg-linen text-ink/65 hover:text-ink"
+            )}
+          >
+            <link.icon className="h-4 w-4" />
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}

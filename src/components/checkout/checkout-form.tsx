@@ -10,6 +10,7 @@ export function CheckoutForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const shipping = items.length ? 12 : 0;
+  const fieldClass = "min-h-12 rounded-md border border-ink/10 px-3 py-3 text-base outline-none transition focus:border-navy";
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,47 +66,47 @@ export function CheckoutForm() {
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[1fr_380px]">
+    <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1fr_380px] lg:gap-8">
       <div className="grid gap-6">
-        <section className="rounded-lg border border-ink/10 bg-white p-5 sm:p-6">
+        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <h2 className="text-lg font-semibold">Datos del cliente</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <input name="name" required placeholder="Nombre completo" className="rounded-md border border-ink/10 px-3 py-3" />
-            <input name="email" required type="email" placeholder="Correo" className="rounded-md border border-ink/10 px-3 py-3" />
-            <input name="phone" required placeholder="Telefono" className="rounded-md border border-ink/10 px-3 py-3" />
-            <input name="district" required placeholder="Distrito" className="rounded-md border border-ink/10 px-3 py-3" />
-            <input name="city" required placeholder="Ciudad" className="rounded-md border border-ink/10 px-3 py-3" />
-            <input name="address" required placeholder="Direccion" className="rounded-md border border-ink/10 px-3 py-3" />
-            <textarea name="reference" placeholder="Referencia" className="sm:col-span-2 rounded-md border border-ink/10 px-3 py-3" />
+            <input name="name" required placeholder="Nombre completo" className={fieldClass} />
+            <input name="email" required type="email" placeholder="Correo" className={fieldClass} />
+            <input name="phone" required placeholder="Telefono" className={fieldClass} />
+            <input name="district" required placeholder="Distrito" className={fieldClass} />
+            <input name="city" required placeholder="Ciudad" className={fieldClass} />
+            <input name="address" required placeholder="Direccion" className={fieldClass} />
+            <textarea name="reference" placeholder="Referencia" className={`${fieldClass} min-h-24 sm:col-span-2`} />
           </div>
         </section>
-        <section className="rounded-lg border border-ink/10 bg-white p-5 sm:p-6">
+        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <h2 className="text-lg font-semibold">Envio y pago</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <label className="rounded-lg border border-ink/10 p-4">
+            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input defaultChecked type="radio" name="shippingMethod" value="domicilio" className="mr-2" />
               Envio a domicilio
             </label>
-            <label className="rounded-lg border border-ink/10 p-4">
+            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input type="radio" name="shippingMethod" value="recojo" className="mr-2" />
               Recojo coordinado
             </label>
-            <label className="rounded-lg border border-ink/10 p-4">
+            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input defaultChecked type="radio" name="paymentProvider" value="mercado_pago" className="mr-2" />
               Mercado Pago
             </label>
-            <label className="rounded-lg border border-ink/10 p-4">
+            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input type="radio" name="paymentProvider" value="culqi" className="mr-2" />
               Culqi
             </label>
-            <label className="rounded-lg border border-ink/10 p-4 sm:col-span-2">
+            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:col-span-2 sm:text-base">
               <input type="radio" name="paymentProvider" value="yape_plin" className="mr-2" />
               Yape/Plin manual
             </label>
           </div>
         </section>
       </div>
-      <aside className="h-fit rounded-lg border border-ink/10 bg-white p-6">
+      <aside className="h-fit rounded-lg border border-ink/10 bg-white p-4 sm:p-6 lg:sticky lg:top-28">
         <h2 className="text-lg font-semibold">Resumen</h2>
         <div className="mt-5 grid gap-3 text-sm">
           {items.map((item) => (
@@ -131,7 +132,7 @@ export function CheckoutForm() {
             </div>
           </div>
         </div>
-        <button disabled={status === "loading"} className="mt-6 w-full rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:bg-ink/35">
+        <button disabled={status === "loading"} className="mt-6 min-h-12 w-full rounded-full bg-ink px-5 py-3.5 text-sm font-semibold text-white disabled:bg-ink/35">
           {status === "loading" ? "Procesando..." : "Confirmar pedido"}
         </button>
         {message ? (
