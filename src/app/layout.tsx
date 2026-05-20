@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { PixelBoot } from "@/components/site/pixel-boot";
 import { RootShell } from "@/components/site/root-shell";
 import "./globals.css";
@@ -18,9 +18,14 @@ export const metadata: Metadata = {
   }
 };
 
+export const viewport: Viewport = {
+  colorScheme: "light",
+  themeColor: "#111111"
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body>
         <PixelBoot />
         <RootShell>{children}</RootShell>

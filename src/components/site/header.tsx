@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Search, ShoppingBag, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { useCart } from "@/components/cart/cart-provider";
 import { Logo } from "@/components/site/logo";
@@ -23,6 +23,15 @@ export function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const { count } = useCart();
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
+
   return (
     <>
       <div className="border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
@@ -34,7 +43,7 @@ export function Header() {
           <button
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}
-            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white lg:hidden"
+            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-white shadow-sm lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -78,46 +87,49 @@ export function Header() {
             </button>
           </div>
         </div>
-
-        {mobileOpen ? (
-          <div className="fixed inset-0 z-50 bg-ink/30 lg:hidden" onClick={() => setMobileOpen(false)}>
-            <div
-              className="h-full w-[min(88vw,360px)] overflow-y-auto bg-porcelain p-4 shadow-soft sm:p-5"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="mb-7 flex items-center justify-between">
-                <Logo compact />
-                <button
-                  aria-label="Cerrar menu"
-                  onClick={() => setMobileOpen(false)}
-                  className="focus-ring grid h-10 w-10 place-items-center rounded-full border border-ink/10"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <nav className="grid gap-2">
-                {nav.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="rounded-md px-3 py-3.5 text-base font-semibold text-ink hover:bg-linen"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-              <Link
-                href="/admin/login"
-                onClick={() => setMobileOpen(false)}
-                className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-ink px-4 py-3 text-sm font-semibold"
-              >
-                Admin
-              </Link>
-            </div>
-          </div>
-        ) : null}
       </header>
+      {mobileOpen ? (
+        <div className="fixed inset-0 z-[70] bg-black text-white lg:hidden" onClick={() => setMobileOpen(false)}>
+          <div
+            className="flex h-full w-full flex-col overflow-y-auto bg-black p-5 pt-[max(1.25rem,env(safe-area-inset-top))] shadow-soft"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-5 border-b border-white/10 pb-6">
+              <Logo tone="light" compact />
+              <button
+                aria-label="Cerrar menu"
+                onClick={() => setMobileOpen(false)}
+                className="focus-ring grid h-12 w-12 place-items-center rounded-full border border-white/20 bg-white/5 text-white"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <nav className="grid gap-2 border-b border-white/10 py-6">
+              {nav.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md px-2 py-4 text-2xl font-semibold leading-none text-white transition hover:bg-white/10"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="grid gap-3 py-6 text-sm text-white/58">
+              <p>Ropa americana seleccionada.</p>
+              <p>Prendas unicas, estilo autentico y calidad de marca.</p>
+            </div>
+            <Link
+              href="/admin/login"
+              onClick={() => setMobileOpen(false)}
+              className="mt-auto inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/25 px-4 py-3 text-sm font-semibold text-white"
+            >
+              Admin
+            </Link>
+          </div>
+        </div>
+      ) : null}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
