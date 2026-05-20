@@ -43,12 +43,17 @@ export function Header() {
           <button
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}
-            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-white shadow-sm lg:hidden"
+            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white shadow-sm md:border-ink/10 md:bg-ink lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          <Logo compact />
+          <span className="md:hidden">
+            <Logo tone="light" compact />
+          </span>
+          <span className="hidden md:inline-flex">
+            <Logo compact />
+          </span>
 
           <nav className="hidden items-center gap-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/55 lg:flex">
             {nav.map((item) => (
@@ -75,7 +80,7 @@ export function Header() {
             </Link>
             <button
               onClick={() => setCartOpen(true)}
-              className="focus-ring relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-ink text-white transition hover:bg-navy sm:h-11 sm:w-11"
+              className="focus-ring relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white transition hover:bg-navy sm:h-11 sm:w-11 md:border-transparent md:bg-ink"
               aria-label="Abrir carrito"
             >
               <ShoppingBag className="h-5 w-5" />

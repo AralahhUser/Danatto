@@ -62,3 +62,76 @@ textarea {
 .section-pad {
   @apply py-10 sm:py-16 lg:py-24;
 }
+
+@media (max-width: 767px) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background: #000000 !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+  }
+
+  [class*="bg-porcelain"],
+  [class*="bg-white"],
+  [class*="bg-linen"],
+  [class*="bg-mist"] {
+    background-color: #000000 !important;
+  }
+
+  [class*="bg-white/"],
+  [class*="bg-porcelain/"] {
+    background-color: rgb(255 255 255 / 0.06) !important;
+  }
+
+  header,
+  [class*="bg-porcelain/90"] {
+    background-color: #000000 !important;
+  }
+
+  [class*="text-ink/35"],
+  [class*="text-ink/40"],
+  [class*="text-ink/45"] {
+    color: rgb(255 255 255 / 0.42) !important;
+  }
+
+  [class*="text-ink/50"],
+  [class*="text-ink/55"],
+  [class*="text-ink/60"],
+  [class*="text-ink/62"],
+  [class*="text-ink/65"],
+  [class*="text-ink/68"],
+  [class*="text-ink/70"] {
+    color: rgb(255 255 255 / 0.72) !important;
+  }
+
+  [class*="text-ink"],
+  [class*="text-navy"],
+  [class*="text-olive"] {
+    color: #ffffff !important;
+  }
+
+  [class*="border-ink"],
+  [class*="border-olive"],
+  [class*="border-white/10"] {
+    border-color: rgb(255 255 255 / 0.14) !important;
+  }
+
+  input,
+  select,
+  textarea {
+    background: #050505 !important;
+    color: #ffffff !important;
+    border-color: rgb(255 255 255 / 0.18) !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(255 255 255 / 0.48) !important;
+  }
+}

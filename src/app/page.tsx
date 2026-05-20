@@ -25,40 +25,40 @@ export default async function HomePage() {
           sizes="100vw"
           className="object-cover object-[58%_center] sm:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/95 via-white/88 to-white/95 lg:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/92 via-black/82 to-black lg:hidden sm:from-white/95 sm:via-white/88 sm:to-white/95" />
         <div className="absolute inset-0 hidden bg-gradient-to-r from-porcelain via-porcelain/90 to-porcelain/20 lg:block" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-porcelain to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent sm:from-porcelain" />
         <div className="container-page relative flex min-h-[calc(100svh-220px)] items-center py-10 sm:min-h-[660px] sm:py-20">
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-white/75 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/55 sm:px-4 sm:text-xs sm:tracking-[0.2em]">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/62 sm:border-ink/10 sm:bg-white/75 sm:px-4 sm:text-xs sm:tracking-[0.2em] sm:text-ink/55">
               <Sparkles className="h-3.5 w-3.5 text-champagne sm:h-4 sm:w-4" />
               Danatto curated essentials
             </p>
-            <h1 className="mt-5 max-w-2xl text-[38px] font-semibold leading-[1] text-ink sm:mt-7 sm:text-7xl sm:leading-[0.95]">
+            <h1 className="mt-5 max-w-2xl text-[38px] font-semibold leading-[1] text-white sm:mt-7 sm:text-7xl sm:leading-[0.95] sm:text-ink">
               Ropa americana seleccionada
             </h1>
-            <p className="mt-5 max-w-[22rem] text-base leading-7 text-ink/68 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-8">
+            <p className="mt-5 max-w-[22rem] text-base leading-7 text-white/76 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-8 sm:text-ink/68">
               Prendas unicas de marcas reconocidas, listas para una nueva historia.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
               <Link href="/shop" className="focus-ring inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-navy sm:py-4">
                 Comprar ahora <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/shop?sort=recent" className="focus-ring min-h-12 rounded-full border border-ink/20 bg-white/55 px-7 py-3.5 text-center text-sm font-semibold text-ink transition hover:bg-white sm:py-4">
+              <Link href="/shop?sort=recent" className="focus-ring min-h-12 rounded-full border border-white/18 bg-white/5 px-7 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-white/10 sm:border-ink/20 sm:bg-white/55 sm:py-4 sm:text-ink sm:hover:bg-white">
                 Ver novedades
               </Link>
             </div>
-            <div className="mt-9 grid max-w-xl grid-cols-3 gap-2 border-y border-ink/10 py-4 text-xs leading-snug text-ink/62 sm:mt-12 sm:gap-3 sm:py-5 sm:text-sm">
+            <div className="mt-9 grid max-w-xl grid-cols-3 gap-2 border-y border-white/12 py-4 text-xs leading-snug text-white/70 sm:mt-12 sm:gap-3 sm:border-ink/10 sm:py-5 sm:text-sm sm:text-ink/62">
               <div>
-                <p className="text-base font-semibold text-ink sm:text-lg">1/1</p>
+                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">1/1</p>
                 <p>Piezas unicas</p>
               </div>
               <div>
-                <p className="text-base font-semibold text-ink sm:text-lg">+9</p>
+                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">+9</p>
                 <p>Marcas clave</p>
               </div>
               <div>
-                <p className="text-base font-semibold text-ink sm:text-lg">PE</p>
+                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">PE</p>
                 <p>Envios Peru</p>
               </div>
             </div>
