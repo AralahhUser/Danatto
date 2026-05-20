@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, CreditCard, MessageCircle, PackageCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, CreditCard, Instagram, PackageCheck, Sparkles } from "lucide-react";
 import { BrandCarousel } from "@/components/brand/brand-carousel";
 import { ProductGrid } from "@/components/product/product-grid";
 import { getBrands, getProducts } from "@/lib/catalog";
@@ -72,7 +72,7 @@ export default async function HomePage() {
             { icon: PackageCheck, label: "Prendas revisadas" },
             { icon: CreditCard, label: "Compra segura" },
             { icon: CheckCircle2, label: "Envios disponibles" },
-            { icon: MessageCircle, label: "Atencion por WhatsApp" }
+            { icon: Instagram, label: "Contacto por Instagram" }
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-2 sm:gap-3">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink/10 bg-white text-navy sm:h-10 sm:w-10">

@@ -6,7 +6,7 @@ const policies = {
     title: "Envios",
     body: [
       "Realizamos envios a domicilio dentro de Peru mediante operadores disponibles segun ciudad y distrito.",
-      "El costo de envio se calcula en checkout o se confirma por WhatsApp cuando el pedido requiere coordinacion especial.",
+      "El costo de envio se calcula en checkout o se confirma por Instagram cuando el pedido requiere coordinacion especial.",
       "Los pedidos se preparan despues de validar el pago y los datos de entrega."
     ]
   },

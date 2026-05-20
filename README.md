@@ -73,7 +73,7 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/danatto?schema=publi
 JWT_SECRET="replace-with-a-long-random-secret"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXT_PUBLIC_WHATSAPP_NUMBER="51999999999"
-NEXT_PUBLIC_INSTAGRAM_URL="https://instagram.com/danatto"
+NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/danatto.1/"
 NEXT_PUBLIC_META_PIXEL_ID=""
 NEXT_PUBLIC_TIKTOK_PIXEL_ID=""
 MERCADO_PAGO_ACCESS_TOKEN=""

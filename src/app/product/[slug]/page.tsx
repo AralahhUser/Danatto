@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MessageCircle, Ruler, ShieldCheck } from "lucide-react";
+import { Instagram, Ruler, ShieldCheck } from "lucide-react";
 import { AddToCartButton } from "@/components/product/add-to-cart-button";
 import { ConditionBadge } from "@/components/product/condition-badge";
 import { ProductGallery } from "@/components/product/product-gallery";
@@ -29,7 +29,7 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
   const related = (await getProducts({ category: product.category.slug })).filter((item) => item.id !== product.id).slice(0, 4);
   const price = productPrice(product.price, product.salePrice);
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51999999999";
+  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.1/";
 
   return (
     <main className="container-page py-8 sm:py-16 lg:py-24">
@@ -72,11 +72,13 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <AddToCartButton product={product} />
             <a
-              href={`https://wa.me/${whatsapp}?text=Hola%20Danatto,%20quiero%20consultar%20por%20${encodeURIComponent(product.name)}`}
+              href={instagram}
+              target="_blank"
+              rel="noreferrer"
               className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-ink px-6 py-3.5 text-sm font-semibold sm:py-4"
             >
-              <MessageCircle className="h-5 w-5" />
-              Consultar por WhatsApp
+              <Instagram className="h-5 w-5" />
+              Consultar por Instagram
             </a>
           </div>
           <div className="mt-8 divide-y divide-ink/10 rounded-lg border border-ink/10 bg-white">

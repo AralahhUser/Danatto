@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Mail, MessageCircle } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 
 const policyLinks = [
@@ -11,8 +11,7 @@ const policyLinks = [
 ];
 
 export function Footer() {
-  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51999999999";
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://instagram.com/danatto";
+  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.1/";
 
   return (
     <footer className="border-t border-white/10 bg-ink text-white">
@@ -46,14 +45,8 @@ export function Footer() {
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-white/40">Contacto</h3>
           <div className="mt-4 grid gap-3 text-sm text-white/65">
-            <a className="inline-flex items-center gap-2" href={`https://wa.me/${whatsapp}`}>
-              <MessageCircle className="h-4 w-4" /> WhatsApp
-            </a>
-            <a className="inline-flex items-center gap-2" href={instagram}>
-              <Instagram className="h-4 w-4" /> Instagram
-            </a>
-            <a className="inline-flex items-center gap-2" href="mailto:hola@danatto.com">
-              <Mail className="h-4 w-4" /> hola@danatto.com
+            <a className="inline-flex items-center gap-2" href={instagram} target="_blank" rel="noreferrer">
+              <Instagram className="h-4 w-4" /> @danatto.1
             </a>
           </div>
         </div>
