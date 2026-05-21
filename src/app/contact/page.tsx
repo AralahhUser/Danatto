@@ -6,7 +6,7 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.1/";
+  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.store/";
 
   return (
     <main className="container-page py-8 sm:py-16 lg:py-24">
@@ -27,7 +27,7 @@ export default function ContactPage() {
             <Instagram className="h-6 w-6" />
           </span>
           <span>
-            <span className="block text-2xl font-semibold">@danatto.1</span>
+            <span className="block text-2xl font-semibold">@danatto.store</span>
             <span className="mt-2 block text-sm leading-6 text-ink/60">
               Ropa americana seleccionada, drops, consultas por medidas y novedades de marca.
             </span>

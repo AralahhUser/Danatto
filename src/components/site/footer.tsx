@@ -11,7 +11,7 @@ const policyLinks = [
 ];
 
 export function Footer() {
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.1/";
+  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.store/";
 
   return (
     <footer className="border-t border-white/10 bg-ink text-white">
@@ -45,7 +45,7 @@ export function Footer() {
           <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-white/40">Contacto</h3>
           <div className="mt-4 grid gap-3 text-sm text-white/65">
             <a className="inline-flex items-center gap-2" href={instagram} target="_blank" rel="noreferrer">
-              <Instagram className="h-4 w-4" /> @danatto.1
+              <Instagram className="h-4 w-4" /> @danatto.store
             </a>
           </div>
         </div>

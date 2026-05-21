@@ -29,7 +29,7 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
   const related = (await getProducts({ category: product.category.slug })).filter((item) => item.id !== product.id).slice(0, 4);
   const price = productPrice(product.price, product.salePrice);
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.1/";
+  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.store/";
 
   return (
     <main className="container-page py-8 sm:py-16 lg:py-24">
