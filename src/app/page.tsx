@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, CreditCard, Instagram, PackageCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { ProductGrid } from "@/components/product/product-grid";
 import { getProducts } from "@/lib/catalog";
 
@@ -46,39 +46,7 @@ export default async function HomePage() {
                 Ver novedades
               </Link>
             </div>
-            <div className="mt-9 grid max-w-xl grid-cols-3 gap-2 border-y border-white/12 py-4 text-xs leading-snug text-white/70 sm:mt-12 sm:gap-3 sm:border-ink/10 sm:py-5 sm:text-sm sm:text-ink/62">
-              <div>
-                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">1/1</p>
-                <p>Piezas unicas</p>
-              </div>
-              <div>
-                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">Curado</p>
-                <p>Seleccion fina</p>
-              </div>
-              <div>
-                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">PE</p>
-                <p>Envios Peru</p>
-              </div>
-            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="border-y border-ink/10 bg-porcelain py-5">
-        <div className="container-page grid grid-cols-2 gap-x-3 gap-y-4 text-xs text-ink/68 sm:grid-cols-2 sm:text-sm lg:grid-cols-4">
-          {[
-            { icon: PackageCheck, label: "Prendas revisadas" },
-            { icon: CreditCard, label: "Compra segura" },
-            { icon: CheckCircle2, label: "Envios disponibles" },
-            { icon: Instagram, label: "Contacto por Instagram" }
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-2 sm:gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink/10 bg-white text-navy sm:h-10 sm:w-10">
-                <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </span>
-              <span className="font-semibold leading-snug">{item.label}</span>
-            </div>
-          ))}
         </div>
       </section>
 
