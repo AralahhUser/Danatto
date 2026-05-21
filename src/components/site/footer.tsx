@@ -20,7 +20,7 @@ export function Footer() {
           <Logo tone="light" />
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/60">
             Ropa americana seleccionada para vestir con estilo, calidad y autenticidad. Piezas
-            unicas de marcas reconocidas, revisadas una por una.
+            unicas con una seleccion limpia, moderna y atemporal.
           </p>
         </div>
         <div>
@@ -28,7 +28,6 @@ export function Footer() {
           <div className="mt-4 grid gap-3 text-sm text-white/65">
             <Link href="/shop">Tienda</Link>
             <Link href="/shop?sort=recent">Nuevos ingresos</Link>
-            <Link href="/shop?brand=ralph-lauren">Marcas premium</Link>
             <Link href="/cart">Carrito</Link>
           </div>
         </div>

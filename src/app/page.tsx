@@ -1,17 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, CreditCard, Instagram, PackageCheck, Sparkles } from "lucide-react";
-import { BrandCarousel } from "@/components/brand/brand-carousel";
 import { ProductGrid } from "@/components/product/product-grid";
-import { getBrands, getProducts } from "@/lib/catalog";
+import { getProducts } from "@/lib/catalog";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, newArrivals, brands] = await Promise.all([
+  const [featured, newArrivals] = await Promise.all([
     getProducts({ featured: true }),
-    getProducts({ newArrival: true }),
-    getBrands()
+    getProducts({ newArrival: true })
   ]);
 
   return (
@@ -54,8 +52,8 @@ export default async function HomePage() {
                 <p>Piezas unicas</p>
               </div>
               <div>
-                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">+9</p>
-                <p>Marcas clave</p>
+                <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">Curado</p>
+                <p>Seleccion fina</p>
               </div>
               <div>
                 <p className="text-base font-semibold text-white sm:text-lg sm:text-ink">PE</p>
@@ -105,14 +103,6 @@ export default async function HomePage() {
           </div>
           <ProductGrid products={newArrivals.slice(0, 4)} />
         </div>
-      </section>
-
-      <section className="container-page section-pad">
-        <div className="mx-auto mb-8 max-w-2xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-olive">Marcas disponibles</p>
-          <h2 className="mt-3 text-3xl font-semibold sm:text-5xl">Calidad de marca, nueva oportunidad</h2>
-        </div>
-        <BrandCarousel brands={brands} />
       </section>
     </main>
   );

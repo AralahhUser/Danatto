@@ -12,7 +12,6 @@ import { clsx } from "clsx";
 const nav = [
   { href: "/shop", label: "Tienda" },
   { href: "/shop?sort=recent", label: "Novedades" },
-  { href: "/shop?brand=ralph-lauren", label: "Marcas" },
   { href: "/about", label: "Nosotros" },
   { href: "/contact", label: "Contacto" }
 ];
@@ -35,8 +34,7 @@ export function Header() {
   return (
     <>
       <div className="border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
-        <span className="sm:hidden">Piezas unicas revisadas una por una</span>
-        <span className="hidden sm:inline">Ropa americana seleccionada - piezas unicas revisadas una por una</span>
+        <span>Ropa americana seleccionada</span>
       </div>
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-porcelain/90 backdrop-blur-xl">
         <div className="container-page flex h-[68px] items-center justify-between gap-2 sm:h-24 sm:gap-4">

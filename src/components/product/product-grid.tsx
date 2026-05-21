@@ -5,8 +5,8 @@ export function ProductGrid({ products }: { products: StoreProduct[] }) {
   if (!products.length) {
     return (
       <div className="rounded-lg border border-dashed border-ink/15 bg-white p-10 text-center">
-        <h3 className="text-lg font-semibold">No encontramos prendas con esos filtros</h3>
-        <p className="mt-2 text-sm text-ink/60">Prueba cambiando marca, categoria o rango de precio.</p>
+        <h3 className="text-lg font-semibold">No hay prendas disponibles por ahora</h3>
+        <p className="mt-2 text-sm text-ink/60">Vuelve pronto para ver nuevos ingresos seleccionados.</p>
       </div>
     );
   }
