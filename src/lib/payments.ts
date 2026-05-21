@@ -38,7 +38,7 @@ export async function createMercadoPagoPreference({
       ],
       payer: {
         name: payload.customer.name,
-        email: payload.customer.email,
+        ...(payload.customer.email ? { email: payload.customer.email } : {}),
         phone: { number: payload.customer.phone }
       },
       back_urls: {

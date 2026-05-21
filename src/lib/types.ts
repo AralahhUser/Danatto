@@ -70,14 +70,14 @@ export type CartItem = {
 export type CheckoutPayload = {
   customer: {
     name: string;
-    email: string;
     phone: string;
-    address: string;
+    dni: string;
+    province: string;
     district: string;
-    city: string;
-    reference?: string;
+    shalomAgencyId: string;
+    email?: string;
   };
-  shippingMethod: "domicilio" | "recojo";
+  shippingMethod: "shalom_agency";
   paymentProvider: "mercado_pago" | "culqi" | "yape_plin";
   items: Array<{ productId: string; quantity: number }>;
 };

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validators";
 import { createMercadoPagoPreference } from "@/lib/payments";
+import { getShalomAgencyById, normalizeLocation } from "@/lib/shalom";
 
 export async function POST(request: Request) {
   const parsed = checkoutSchema.safeParse(await request.json());
@@ -9,7 +10,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Datos de checkout invalidos", issues: parsed.error.flatten() }, { status: 400 });
   }
   const payload = parsed.data;
-  const shippingCost = payload.shippingMethod === "domicilio" ? 12 : 0;
+  const shippingCost = 12;
+  const shalomAgency = getShalomAgencyById(payload.customer.shalomAgencyId);
+
+  if (!shalomAgency || normalizeLocation(shalomAgency.province) !== normalizeLocation(payload.customer.province)) {
+    return NextResponse.json({ error: "Agencia Shalom invalida para la provincia seleccionada." }, { status: 400 });
+  }
+
+  const customerData = {
+    name: payload.customer.name,
+    email: payload.customer.email ?? "",
+    phone: payload.customer.phone,
+    dni: payload.customer.dni,
+    address: shalomAgency.address,
+    district: payload.customer.district,
+    city: payload.customer.province,
+    province: payload.customer.province,
+    reference: `Recojo en agencia Shalom: ${shalomAgency.name}`,
+    shalomAgencyId: shalomAgency.id,
+    shalomAgencyName: shalomAgency.name,
+    shalomAgencyAddress: shalomAgency.address,
+    shalomAgencyDistrict: shalomAgency.district,
+    shalomAgencyProvince: shalomAgency.province,
+    shalomAgencyDepartment: shalomAgency.department,
+    shalomAgencyMapsUrl: shalomAgency.mapsUrl
+  };
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -26,7 +51,7 @@ export async function POST(request: Request) {
         subtotal += Number(product.salePrice ?? product.price) * item.quantity;
       }
 
-      const customer = await tx.customer.create({ data: payload.customer });
+      const customer = await tx.customer.create({ data: customerData });
       const order = await tx.order.create({
         data: {
           customerId: customer.id,

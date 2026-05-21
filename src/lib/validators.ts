@@ -31,14 +31,14 @@ export const productSchema = z.object({
 export const checkoutSchema = z.object({
   customer: z.object({
     name: z.string().min(3),
-    email: z.string().email(),
-    phone: z.string().min(7),
-    address: z.string().min(5),
+    email: z.string().email().optional().or(z.literal("")),
+    phone: z.string().min(7).max(15),
+    dni: z.string().regex(/^\d{8}$/, "DNI invalido"),
+    province: z.string().min(2),
     district: z.string().min(2),
-    city: z.string().min(2),
-    reference: z.string().optional()
+    shalomAgencyId: z.string().min(1)
   }),
-  shippingMethod: z.enum(["domicilio", "recojo"]),
+  shippingMethod: z.enum(["shalom_agency"]),
   paymentProvider: z.enum(["mercado_pago", "culqi", "yape_plin"]),
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1)
 });

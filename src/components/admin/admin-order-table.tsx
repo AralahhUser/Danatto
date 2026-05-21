@@ -10,7 +10,16 @@ type OrderRow = {
   shippingStatus: string;
   paymentProvider: string;
   createdAt: Date;
-  customer: { name: string; email: string; phone: string; city: string };
+  customer: {
+    name: string;
+    email?: string | null;
+    phone: string;
+    dni?: string | null;
+    city: string;
+    province?: string | null;
+    district: string;
+    shalomAgencyName?: string | null;
+  };
 };
 
 export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
@@ -45,7 +54,8 @@ export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
                 <td className="px-4 py-3 font-semibold">{order.id.slice(0, 8)}</td>
                 <td className="px-4 py-3">
                   <p className="font-semibold">{order.customer.name}</p>
-                  <p className="text-xs text-ink/45">{order.customer.email}</p>
+                  <p className="text-xs text-ink/45">DNI {order.customer.dni || "-"}</p>
+                  <p className="text-xs text-ink/45">{order.customer.phone}</p>
                 </td>
                 <td className="px-4 py-3">
                   <div className="grid gap-2">
@@ -69,11 +79,14 @@ export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
                     className="rounded-md border border-ink/10 px-2 py-1"
                   >
                     <option value="pendiente">Pendiente</option>
-                    <option value="en_preparacion">En preparación</option>
+                    <option value="en_preparacion">En preparacion</option>
                     <option value="enviado">Enviado</option>
                     <option value="entregado">Entregado</option>
                     <option value="cancelado">Cancelado</option>
                   </select>
+                  <p className="mt-2 text-xs text-ink/45">
+                    {order.customer.shalomAgencyName || `${order.customer.province || order.customer.city}, ${order.customer.district}`}
+                  </p>
                 </td>
                 <td className="px-4 py-3">{formatCurrency(Number(order.total))}</td>
                 <td className="px-4 py-3">{new Date(order.createdAt).toLocaleDateString("es-PE")}</td>

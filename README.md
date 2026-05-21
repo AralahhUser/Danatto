@@ -52,7 +52,7 @@ Requiere Node `>=22.13`.
 npm install
 cp .env.example .env
 npm run db:generate
-npm run db:migrate
+npm run db:push
 npm run db:seed
 npm run dev
 ```
@@ -72,7 +72,6 @@ Copia `.env.example` a `.env` y configura:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/danatto?schema=public"
 JWT_SECRET="replace-with-a-long-random-secret"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-NEXT_PUBLIC_WHATSAPP_NUMBER="51999999999"
 NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/danatto.1/"
 NEXT_PUBLIC_META_PIXEL_ID=""
 NEXT_PUBLIC_TIKTOK_PIXEL_ID=""
@@ -101,6 +100,12 @@ El esquema esta en `prisma/schema.prisma` e incluye:
 - `Banner`
 
 Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y marca el producto como `vendido` si la unidad se agota.
+
+## Checkout con Shalom
+
+El checkout solicita nombres completos, telefono, DNI, provincia y distrito. Con esos datos consulta `/api/shalom/agencies`, muestra agencias Shalom del mismo distrito o, si no hay coincidencia exacta, ordena agencias de la misma provincia por distancia aproximada usando geocodificacion publica.
+
+La base filtrada de agencias publicas esta en `src/lib/shalom-agencies.ts` y se genero desde la data publica de Shalom. Si actualizas la red de agencias, vuelve a regenerar ese archivo antes de desplegar.
 
 ## Pagos
 
@@ -147,7 +152,7 @@ Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js de
 Comandos recomendados para produccion:
 
 ```bash
-npm run db:deploy
+npm run db:push
 npm run db:seed
 npm run build
 ```

@@ -111,18 +111,28 @@ model Category {
 }
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  phone     String
-  address   String
-  district  String
-  city      String
-  reference String?
-  createdAt DateTime @default(now())
-  orders    Order[]
+  id                     String   @id @default(cuid())
+  name                   String
+  email                  String   @default("")
+  phone                  String
+  dni                    String?
+  address                String   @default("")
+  district               String
+  city                   String   @default("")
+  province               String?
+  reference              String?
+  shalomAgencyId         String?
+  shalomAgencyName       String?
+  shalomAgencyAddress    String?
+  shalomAgencyDistrict   String?
+  shalomAgencyProvince   String?
+  shalomAgencyDepartment String?
+  shalomAgencyMapsUrl    String?
+  createdAt              DateTime @default(now())
+  orders                 Order[]
 
   @@index([email])
+  @@index([dni])
 }
 
 model Order {

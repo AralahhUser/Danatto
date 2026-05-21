@@ -14,9 +14,10 @@ export default async function AdminCustomersPage() {
             <thead className="bg-linen text-xs uppercase text-ink/50">
               <tr>
                 <th className="px-4 py-3">Nombre</th>
-                <th className="px-4 py-3">Correo</th>
+                <th className="px-4 py-3">DNI</th>
                 <th className="px-4 py-3">Telefono</th>
-                <th className="px-4 py-3">Direccion</th>
+                <th className="px-4 py-3">Ubicacion</th>
+                <th className="px-4 py-3">Agencia Shalom</th>
                 <th className="px-4 py-3">Compras</th>
               </tr>
             </thead>
@@ -24,14 +25,18 @@ export default async function AdminCustomersPage() {
               {customers.map((customer) => (
                 <tr key={customer.id}>
                   <td className="px-4 py-3 font-semibold">{customer.name}</td>
-                  <td className="px-4 py-3">{customer.email}</td>
+                  <td className="px-4 py-3">{customer.dni || "-"}</td>
                   <td className="px-4 py-3">{customer.phone}</td>
-                  <td className="px-4 py-3">{customer.address}, {customer.district}</td>
+                  <td className="px-4 py-3">{customer.province || customer.city}, {customer.district}</td>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold">{customer.shalomAgencyName || "-"}</p>
+                    {customer.shalomAgencyAddress ? <p className="mt-1 text-xs text-ink/50">{customer.shalomAgencyAddress}</p> : null}
+                  </td>
                   <td className="px-4 py-3">{customer.orders.length}</td>
                 </tr>
               ))}
               {!customers.length ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-ink/50">Sin clientes todavia.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-ink/50">Sin clientes todavia.</td></tr>
               ) : null}
             </tbody>
           </table>
