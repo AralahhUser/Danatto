@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Instagram, Ruler, ShieldCheck } from "lucide-react";
+import { MessageCircle, Ruler, ShieldCheck } from "lucide-react";
 import { AddToCartButton } from "@/components/product/add-to-cart-button";
+import { BuyNowButton } from "@/components/product/buy-now-button";
 import { ConditionBadge } from "@/components/product/condition-badge";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductGrid } from "@/components/product/product-grid";
@@ -29,7 +30,12 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
   const related = (await getProducts({ category: product.category.slug })).filter((item) => item.id !== product.id).slice(0, 4);
   const price = productPrice(product.price, product.salePrice);
-  const instagram = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/danatto.store/";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.vercel.app";
+  const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51912354180").replace(/\D/g, "");
+  const whatsappMessage = encodeURIComponent(
+    `Hola Danatto, quiero consultar por ${product.name} (${siteUrl}/product/${product.slug}).`
+  );
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   return (
     <main className="container-page py-8 sm:py-16 lg:py-24">
@@ -69,16 +75,17 @@ export default async function ProductPage({ params }: PageProps) {
           <div className="mt-6 rounded-lg border border-olive/20 bg-olive/10 p-4 text-sm text-olive">
             Cada prenda es unica. Solo hay una unidad disponible, salvo que el administrador indique stock adicional.
           </div>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="mt-6 grid gap-3">
+            <BuyNowButton product={product} />
             <AddToCartButton product={product} />
             <a
-              href={instagram}
+              href={whatsappUrl}
               target="_blank"
               rel="noreferrer"
               className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-ink px-6 py-3.5 text-sm font-semibold sm:py-4"
             >
-              <Instagram className="h-5 w-5" />
-              Consultar por Instagram
+              <MessageCircle className="h-5 w-5" />
+              Consultar por WhatsApp
             </a>
           </div>
           <div className="mt-8 divide-y divide-ink/10 rounded-lg border border-ink/10 bg-white">
