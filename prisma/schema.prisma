@@ -117,6 +117,7 @@ model Customer {
   phone                  String
   dni                    String?
   address                String   @default("")
+  department             String?
   district               String
   city                   String   @default("")
   province               String?

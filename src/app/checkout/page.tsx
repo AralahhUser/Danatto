@@ -12,7 +12,7 @@ export default function CheckoutPage() {
         <p className="text-sm font-semibold uppercase text-olive">Pago seguro</p>
         <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Finalizar compra</h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/65 sm:text-base">
-          Completa tus datos y elige la agencia Shalom mas conveniente para recibir tu pedido.
+          Completa tus datos, indica departamento, provincia y distrito, y elige la agencia Shalom mas conveniente.
         </p>
       </div>
       <CheckoutForm />

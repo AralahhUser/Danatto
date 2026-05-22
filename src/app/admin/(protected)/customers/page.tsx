@@ -27,7 +27,9 @@ export default async function AdminCustomersPage() {
                   <td className="px-4 py-3 font-semibold">{customer.name}</td>
                   <td className="px-4 py-3">{customer.dni || "-"}</td>
                   <td className="px-4 py-3">{customer.phone}</td>
-                  <td className="px-4 py-3">{customer.province || customer.city}, {customer.district}</td>
+                  <td className="px-4 py-3">
+                    {[customer.department, customer.province || customer.city, customer.district].filter(Boolean).join(", ")}
+                  </td>
                   <td className="px-4 py-3">
                     <p className="font-semibold">{customer.shalomAgencyName || "-"}</p>
                     {customer.shalomAgencyAddress ? <p className="mt-1 text-xs text-ink/50">{customer.shalomAgencyAddress}</p> : null}

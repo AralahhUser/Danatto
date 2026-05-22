@@ -5,12 +5,18 @@ import Link from "next/link";
 import { CheckCircle2, MapPin } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { formatCurrency } from "@/lib/format";
-import { getShalomDistricts, shalomProvinces, type ShalomAgencyOption } from "@/lib/shalom";
+import {
+  getShalomDistricts,
+  getShalomProvinces,
+  shalomDepartments,
+  type ShalomAgencyOption
+} from "@/lib/shalom";
 
 export function CheckoutForm() {
   const { items, subtotal, clear } = useCart();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [department, setDepartment] = useState("");
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
   const [selectedAgencyId, setSelectedAgencyId] = useState("");
@@ -20,12 +26,14 @@ export function CheckoutForm() {
   const [showAllAgencies, setShowAllAgencies] = useState(false);
   const shipping = items.length ? 12 : 0;
   const fieldClass = "min-h-12 rounded-md border border-ink/10 bg-white px-3 py-3 text-base outline-none transition focus:border-navy";
-  const districts = useMemo(() => getShalomDistricts(province), [province]);
+  const provinces = useMemo(() => getShalomProvinces(department), [department]);
+  const districts = useMemo(() => getShalomDistricts(department, province), [department, province]);
   const selectedAgency = agencyOptions.find((agency) => agency.id === selectedAgencyId);
+  const matchLevel = agencyOptions[0]?.matchLevel;
   const visibleAgencyOptions = useMemo(() => {
-    if (showAllAgencies || agencyOptions[0]?.matchLevel === "district") return agencyOptions;
+    if (showAllAgencies || matchLevel === "district") return agencyOptions;
     return agencyOptions.slice(0, 8);
-  }, [agencyOptions, showAllAgencies]);
+  }, [agencyOptions, matchLevel, showAllAgencies]);
 
   useEffect(() => {
     setSelectedAgencyId(agencyOptions[0]?.id ?? "");
@@ -34,18 +42,17 @@ export function CheckoutForm() {
   useEffect(() => {
     setShowAllAgencies(false);
 
-    if (!province || !district) {
+    if (!department || !province || !district) {
       setAgencyOptions([]);
       setGeocoded(false);
       return;
     }
 
     const controller = new AbortController();
+    const params = new URLSearchParams({ department, province, district });
     setAgenciesLoading(true);
 
-    fetch(`/api/shalom/agencies?province=${encodeURIComponent(province)}&district=${encodeURIComponent(district)}`, {
-      signal: controller.signal
-    })
+    fetch(`/api/shalom/agencies?${params.toString()}`, { signal: controller.signal })
       .then((response) => response.json())
       .then((data: { agencies?: ShalomAgencyOption[]; geocoded?: boolean }) => {
         setAgencyOptions(data.agencies ?? []);
@@ -62,7 +69,7 @@ export function CheckoutForm() {
       });
 
     return () => controller.abort();
-  }, [province, district]);
+  }, [department, province, district]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -79,6 +86,7 @@ export function CheckoutForm() {
         name: String(form.get("name") || ""),
         phone: String(form.get("phone") || ""),
         dni: String(form.get("dni") || ""),
+        department: String(form.get("department") || ""),
         province: String(form.get("province") || ""),
         district: String(form.get("district") || ""),
         shalomAgencyId: selectedAgency.id
@@ -122,11 +130,32 @@ export function CheckoutForm() {
     );
   }
 
+  const agencyNotice =
+    matchLevel === "district"
+      ? geocoded
+        ? "Estas agencias corresponden al distrito indicado y se ordenan por distancia aproximada."
+        : "Estas agencias corresponden al distrito indicado."
+      : matchLevel === "province"
+        ? geocoded
+          ? "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia ordenadas por cercania aproximada."
+          : "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia."
+        : matchLevel === "department"
+          ? geocoded
+            ? "No hay sedes en esa provincia. Mostramos opciones del mismo departamento ordenadas por cercania aproximada."
+            : "No hay sedes en esa provincia. Mostramos opciones del mismo departamento."
+          : "";
+
   return (
     <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1fr_380px] lg:gap-8">
       <div className="grid gap-6">
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
-          <h2 className="text-lg font-semibold">Datos del cliente</h2>
+          <div className="flex items-start gap-3">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">1</span>
+            <div>
+              <h2 className="text-lg font-semibold">Datos del cliente</h2>
+              <p className="mt-1 text-sm leading-6 text-ink/60">Usaremos estos datos para registrar tu pedido.</p>
+            </div>
+          </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <input name="name" required placeholder="Nombres completos" className={`${fieldClass} sm:col-span-2`} />
             <input name="phone" required inputMode="tel" placeholder="Numero de telefono" className={fieldClass} />
@@ -139,10 +168,43 @@ export function CheckoutForm() {
               placeholder="Numero de DNI"
               className={fieldClass}
             />
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">2</span>
+            <div>
+              <h2 className="text-lg font-semibold">Ubicacion de destino</h2>
+              <p className="mt-1 text-sm leading-6 text-ink/60">
+                Selecciona departamento, provincia y distrito para encontrar las sedes Shalom mas cercanas.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-4 sm:grid-cols-3">
+            <select
+              name="department"
+              required
+              value={department}
+              onChange={(event) => {
+                setDepartment(event.target.value);
+                setProvince("");
+                setDistrict("");
+              }}
+              className={fieldClass}
+            >
+              <option value="">Departamento</option>
+              {shalomDepartments.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
             <select
               name="province"
               required
               value={province}
+              disabled={!department}
               onChange={(event) => {
                 setProvince(event.target.value);
                 setDistrict("");
@@ -150,7 +212,7 @@ export function CheckoutForm() {
               className={fieldClass}
             >
               <option value="">Provincia</option>
-              {shalomProvinces.map((item) => (
+              {provinces.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -173,14 +235,23 @@ export function CheckoutForm() {
             </datalist>
           </div>
         </section>
+
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold">Agencia Shalom cercana</h2>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">3</span>
+              <div>
+                <h2 className="text-lg font-semibold">Agencia Shalom cercana</h2>
+                <p className="mt-1 text-sm leading-6 text-ink/60">
+                  Elige la sede donde prefieres recoger tu pedido.
+                </p>
+              </div>
+            </div>
             {selectedAgency ? <span className="text-xs font-semibold uppercase tracking-[0.18em] text-olive">Seleccionada</span> : null}
           </div>
           {!district ? (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
-              Selecciona provincia y distrito para ver las agencias Shalom disponibles.
+              Completa departamento, provincia y distrito para ver sedes Shalom cercanas.
             </div>
           ) : agenciesLoading ? (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
@@ -188,68 +259,64 @@ export function CheckoutForm() {
             </div>
           ) : agencyOptions.length ? (
             <div className="mt-5 grid gap-3">
-              {agencyOptions[0]?.matchLevel === "province" ? (
-                <p className="rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
-                  {geocoded
-                    ? "No hay agencia exacta en ese distrito. Estas opciones estan ordenadas por distancia aproximada."
-                    : "No hay agencia exacta en ese distrito. Estas opciones pertenecen a la misma provincia."}
-                </p>
-              ) : null}
+              {agencyNotice ? <p className="rounded-lg bg-linen/60 p-3 text-sm text-ink/60">{agencyNotice}</p> : null}
               <div className="grid max-h-[460px] gap-3 overflow-y-auto pr-1">
-              {visibleAgencyOptions.map((agency) => (
-                <label
-                  key={agency.id}
-                  className={`grid cursor-pointer gap-3 rounded-lg border p-4 transition sm:grid-cols-[1fr_auto] ${
-                    selectedAgencyId === agency.id ? "border-ink bg-ink text-white" : "border-ink/10 bg-white hover:border-ink/35"
-                  }`}
-                >
-                  <span className="flex gap-3">
-                    <input
-                      required
-                      type="radio"
-                      name="shalomAgencyId"
-                      value={agency.id}
-                      checked={selectedAgencyId === agency.id}
-                      onChange={() => setSelectedAgencyId(agency.id)}
-                      className="mt-1"
-                    />
-                    <span>
-                      <span className="flex items-center gap-2 text-sm font-semibold sm:text-base">
-                        {agency.name}
-                        {selectedAgencyId === agency.id ? <CheckCircle2 className="h-4 w-4" /> : null}
-                      </span>
-                      <span className={`mt-1 block text-sm ${selectedAgencyId === agency.id ? "text-white/75" : "text-ink/60"}`}>
-                        {agency.district}, {agency.province}
-                      </span>
-                      <span className={`mt-2 block text-sm leading-5 ${selectedAgencyId === agency.id ? "text-white/75" : "text-ink/65"}`}>
-                        {agency.address || "Direccion por confirmar con Shalom"}
+                {visibleAgencyOptions.map((agency) => (
+                  <label
+                    key={agency.id}
+                    className={`grid cursor-pointer gap-3 rounded-lg border p-4 transition sm:grid-cols-[1fr_auto] ${
+                      selectedAgencyId === agency.id ? "border-ink bg-ink text-white" : "border-ink/10 bg-white hover:border-ink/35"
+                    }`}
+                  >
+                    <span className="flex gap-3">
+                      <input
+                        required
+                        type="radio"
+                        name="shalomAgencyId"
+                        value={agency.id}
+                        checked={selectedAgencyId === agency.id}
+                        onChange={() => setSelectedAgencyId(agency.id)}
+                        className="mt-1"
+                      />
+                      <span>
+                        <span className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                          {agency.name}
+                          {selectedAgencyId === agency.id ? <CheckCircle2 className="h-4 w-4" /> : null}
+                        </span>
+                        <span className={`mt-1 block text-sm ${selectedAgencyId === agency.id ? "text-white/75" : "text-ink/60"}`}>
+                          {agency.department} / {agency.province} / {agency.district}
+                        </span>
+                        <span className={`mt-2 block text-sm leading-5 ${selectedAgencyId === agency.id ? "text-white/75" : "text-ink/65"}`}>
+                          {agency.address || "Direccion por confirmar con Shalom"}
+                        </span>
                       </span>
                     </span>
-                  </span>
-                  <span className="flex items-start justify-between gap-3 sm:justify-end">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedAgencyId === agency.id ? "bg-white/10 text-white" : "bg-linen text-ink/65"}`}>
-                      {typeof agency.distanceKm === "number"
-                        ? `${agency.distanceKm.toFixed(1)} km aprox.`
-                        : agency.matchLevel === "district"
-                          ? "Mismo distrito"
-                          : "Misma provincia"}
+                    <span className="flex items-start justify-between gap-3 sm:justify-end">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedAgencyId === agency.id ? "bg-white/10 text-white" : "bg-linen text-ink/65"}`}>
+                        {typeof agency.distanceKm === "number"
+                          ? `${agency.distanceKm.toFixed(1)} km aprox.`
+                          : agency.matchLevel === "district"
+                            ? "Mismo distrito"
+                            : agency.matchLevel === "province"
+                              ? "Misma provincia"
+                              : "Mismo departamento"}
+                      </span>
+                      {agency.mapsUrl ? (
+                        <a
+                          href={agency.mapsUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`inline-flex h-9 w-9 items-center justify-center rounded-full border ${
+                            selectedAgencyId === agency.id ? "border-white/20 text-white" : "border-ink/10 text-ink"
+                          }`}
+                          aria-label={`Ver mapa de ${agency.name}`}
+                        >
+                          <MapPin className="h-4 w-4" />
+                        </a>
+                      ) : null}
                     </span>
-                    {agency.mapsUrl ? (
-                      <a
-                        href={agency.mapsUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex h-9 w-9 items-center justify-center rounded-full border ${
-                          selectedAgencyId === agency.id ? "border-white/20 text-white" : "border-ink/10 text-ink"
-                        }`}
-                        aria-label={`Ver mapa de ${agency.name}`}
-                      >
-                        <MapPin className="h-4 w-4" />
-                      </a>
-                    ) : null}
-                  </span>
-                </label>
-              ))}
+                  </label>
+                ))}
               </div>
               {visibleAgencyOptions.length < agencyOptions.length ? (
                 <button
@@ -257,16 +324,17 @@ export function CheckoutForm() {
                   onClick={() => setShowAllAgencies(true)}
                   className="min-h-11 rounded-full border border-ink/10 px-4 py-2 text-sm font-semibold text-ink"
                 >
-                  Ver todas las agencias de {province}
+                  Ver todas las agencias disponibles
                 </button>
               ) : null}
             </div>
           ) : (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
-              No encontramos agencias para ese distrito. Prueba con una provincia cercana.
+              No encontramos agencias para esa ubicacion. Prueba con una provincia o distrito cercano.
             </div>
           )}
         </section>
+
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <h2 className="text-lg font-semibold">Metodo de pago</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -311,8 +379,14 @@ export function CheckoutForm() {
             </div>
           </div>
         </div>
-        {selectedAgency ? (
+        {department || province || district ? (
           <div className="mt-5 rounded-lg bg-linen/60 p-4 text-sm">
+            <p className="font-semibold">Destino</p>
+            <p className="mt-1 text-ink/65">{[department, province, district].filter(Boolean).join(" / ")}</p>
+          </div>
+        ) : null}
+        {selectedAgency ? (
+          <div className="mt-3 rounded-lg bg-linen/60 p-4 text-sm">
             <p className="font-semibold">Recojo en Shalom</p>
             <p className="mt-1 text-ink/65">{selectedAgency.name}</p>
             <p className="mt-1 text-ink/55">{selectedAgency.address}</p>

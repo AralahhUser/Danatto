@@ -15,6 +15,7 @@ type OrderRow = {
     email?: string | null;
     phone: string;
     dni?: string | null;
+    department?: string | null;
     city: string;
     province?: string | null;
     district: string;
@@ -85,7 +86,10 @@ export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
                     <option value="cancelado">Cancelado</option>
                   </select>
                   <p className="mt-2 text-xs text-ink/45">
-                    {order.customer.shalomAgencyName || `${order.customer.province || order.customer.city}, ${order.customer.district}`}
+                    {order.customer.shalomAgencyName ||
+                      [order.customer.department, order.customer.province || order.customer.city, order.customer.district]
+                        .filter(Boolean)
+                        .join(", ")}
                   </p>
                 </td>
                 <td className="px-4 py-3">{formatCurrency(Number(order.total))}</td>

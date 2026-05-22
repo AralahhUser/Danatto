@@ -13,8 +13,8 @@ export async function POST(request: Request) {
   const shippingCost = 12;
   const shalomAgency = getShalomAgencyById(payload.customer.shalomAgencyId);
 
-  if (!shalomAgency || normalizeLocation(shalomAgency.province) !== normalizeLocation(payload.customer.province)) {
-    return NextResponse.json({ error: "Agencia Shalom invalida para la provincia seleccionada." }, { status: 400 });
+  if (!shalomAgency || normalizeLocation(shalomAgency.department) !== normalizeLocation(payload.customer.department)) {
+    return NextResponse.json({ error: "Agencia Shalom invalida para el departamento seleccionado." }, { status: 400 });
   }
 
   const customerData = {
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
     phone: payload.customer.phone,
     dni: payload.customer.dni,
     address: shalomAgency.address,
+    department: payload.customer.department,
     district: payload.customer.district,
     city: payload.customer.province,
     province: payload.customer.province,

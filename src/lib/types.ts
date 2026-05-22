@@ -72,6 +72,7 @@ export type CheckoutPayload = {
     name: string;
     phone: string;
     dni: string;
+    department: string;
     province: string;
     district: string;
     shalomAgencyId: string;

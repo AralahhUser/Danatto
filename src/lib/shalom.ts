@@ -2,7 +2,7 @@ import { shalomAgencies, type ShalomAgency } from "@/lib/shalom-agencies";
 
 const collator = new Intl.Collator("es-PE", { sensitivity: "base" });
 
-export type ShalomMatchLevel = "district" | "province" | "none";
+export type ShalomMatchLevel = "district" | "province" | "department" | "none";
 
 export type ShalomAgencyOption = ShalomAgency & {
   matchLevel: ShalomMatchLevel;
@@ -21,14 +21,31 @@ function uniqueSorted(values: Iterable<string>) {
   return Array.from(new Set(Array.from(values).filter(Boolean))).sort((a, b) => collator.compare(a, b));
 }
 
+export const shalomDepartments = uniqueSorted(shalomAgencies.map((agency) => agency.department));
+
 export const shalomProvinces = uniqueSorted(shalomAgencies.map((agency) => agency.province));
 
-export function getShalomDistricts(province: string) {
+export function getShalomProvinces(department: string) {
+  const normalizedDepartment = normalizeLocation(department);
+
+  return uniqueSorted(
+    shalomAgencies
+      .filter((agency) => normalizeLocation(agency.department) === normalizedDepartment)
+      .map((agency) => agency.province)
+  );
+}
+
+export function getShalomDistricts(department: string, province: string) {
+  const normalizedDepartment = normalizeLocation(department);
   const normalizedProvince = normalizeLocation(province);
 
   return uniqueSorted(
     shalomAgencies
-      .filter((agency) => normalizeLocation(agency.province) === normalizedProvince)
+      .filter(
+        (agency) =>
+          normalizeLocation(agency.department) === normalizedDepartment &&
+          normalizeLocation(agency.province) === normalizedProvince
+      )
       .map((agency) => agency.district)
   );
 }
@@ -37,20 +54,33 @@ export function getShalomAgencyById(id: string) {
   return shalomAgencies.find((agency) => agency.id === id) ?? null;
 }
 
-export function getShalomAgencyOptions(province: string, district: string): ShalomAgencyOption[] {
+export function getShalomAgencyOptions(department: string, province: string, district: string): ShalomAgencyOption[] {
+  const normalizedDepartment = normalizeLocation(department);
   const normalizedProvince = normalizeLocation(province);
   const normalizedDistrict = normalizeLocation(district);
 
-  if (!normalizedProvince || !normalizedDistrict) return [];
+  if (!normalizedDepartment || !normalizedProvince || !normalizedDistrict) return [];
 
-  const sameProvince = shalomAgencies.filter((agency) => normalizeLocation(agency.province) === normalizedProvince);
+  const sameDepartment = shalomAgencies.filter((agency) => normalizeLocation(agency.department) === normalizedDepartment);
+  const sameProvince = sameDepartment.filter((agency) => normalizeLocation(agency.province) === normalizedProvince);
   const sameDistrict = sameProvince.filter((agency) => normalizeLocation(agency.district) === normalizedDistrict);
-  const base = sameDistrict.length ? sameDistrict : sameProvince;
-  const matchLevel: ShalomMatchLevel = sameDistrict.length ? "district" : sameProvince.length ? "province" : "none";
+  const base = sameDistrict.length ? sameDistrict : sameProvince.length ? sameProvince : sameDepartment;
+  const matchLevel: ShalomMatchLevel = sameDistrict.length
+    ? "district"
+    : sameProvince.length
+      ? "province"
+      : sameDepartment.length
+        ? "department"
+        : "none";
 
   return base
     .map((agency) => ({ ...agency, matchLevel }))
-    .sort((a, b) => collator.compare(a.district, b.district) || collator.compare(a.name, b.name));
+    .sort(
+      (a, b) =>
+        collator.compare(a.province, b.province) ||
+        collator.compare(a.district, b.district) ||
+        collator.compare(a.name, b.name)
+    );
 }
 
 export function distanceKm(from: { lat: number; lng: number }, to: { lat: number; lng: number }) {

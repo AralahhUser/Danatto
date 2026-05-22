@@ -34,6 +34,7 @@ export const checkoutSchema = z.object({
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().min(7).max(15),
     dni: z.string().regex(/^\d{8}$/, "DNI invalido"),
+    department: z.string().min(2),
     province: z.string().min(2),
     district: z.string().min(2),
     shalomAgencyId: z.string().min(1)

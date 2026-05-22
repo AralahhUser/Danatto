@@ -6,12 +6,12 @@ type GeocodeResult = {
   lon: string;
 };
 
-async function geocodeDistrict(province: string, district: string) {
+async function geocodeDistrict(department: string, province: string, district: string) {
   const params = new URLSearchParams({
     format: "jsonv2",
     limit: "1",
     countrycodes: "pe",
-    q: `${district}, ${province}, Peru`
+    q: `${district}, ${province}, ${department}, Peru`
   });
 
   try {
@@ -40,19 +40,16 @@ async function geocodeDistrict(province: string, district: string) {
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const department = searchParams.get("department") || "";
   const province = searchParams.get("province") || "";
   const district = searchParams.get("district") || "";
-  const options = getShalomAgencyOptions(province, district);
+  const options = getShalomAgencyOptions(department, province, district);
 
-  if (!province || !district || !options.length) {
+  if (!department || !province || !district || !options.length) {
     return NextResponse.json({ agencies: [], geocoded: false });
   }
 
-  if (options[0]?.matchLevel === "district") {
-    return NextResponse.json({ agencies: options, geocoded: false });
-  }
-
-  const location = await geocodeDistrict(province, district);
+  const location = await geocodeDistrict(department, province, district);
 
   return NextResponse.json({
     agencies: location ? sortShalomOptionsByDistance(options, location) : options,
