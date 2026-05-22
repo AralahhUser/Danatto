@@ -33,11 +33,11 @@ export function Header() {
 
   return (
     <>
-      <div className="border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
+      <div className="hidden border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:block sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
         <span>Ropa americana seleccionada</span>
       </div>
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-porcelain/90 backdrop-blur-xl">
-        <div className="container-page flex h-[68px] items-center justify-between gap-2 sm:h-24 sm:gap-4">
+        <div className="container-page flex h-16 items-center justify-between gap-2 sm:h-24 sm:gap-4">
           <button
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}

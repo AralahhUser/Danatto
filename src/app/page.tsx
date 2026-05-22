@@ -26,7 +26,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/92 via-black/82 to-black lg:hidden sm:from-white/95 sm:via-white/88 sm:to-white/95" />
         <div className="absolute inset-0 hidden bg-gradient-to-r from-porcelain via-porcelain/90 to-porcelain/20 lg:block" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent sm:from-porcelain" />
-        <div className="container-page relative flex min-h-[calc(100svh-220px)] items-center py-10 sm:min-h-[660px] sm:py-20">
+        <div className="container-page relative flex min-h-[420px] items-center py-9 sm:min-h-[660px] sm:py-20">
           <div className="max-w-3xl">
             <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/62 sm:border-ink/10 sm:bg-white/75 sm:px-4 sm:text-xs sm:tracking-[0.2em] sm:text-ink/55">
               <Sparkles className="h-3.5 w-3.5 text-champagne sm:h-4 sm:w-4" />

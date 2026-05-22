@@ -25,7 +25,9 @@ export function CheckoutForm() {
   const [geocoded, setGeocoded] = useState(false);
   const [showAllAgencies, setShowAllAgencies] = useState(false);
   const shipping = items.length ? 12 : 0;
-  const fieldClass = "min-h-12 rounded-md border border-ink/10 bg-white px-3 py-3 text-base outline-none transition focus:border-navy";
+  const total = subtotal + shipping;
+  const fieldClass =
+    "min-h-12 w-full rounded-md border border-ink/10 bg-white px-3 py-3 text-base outline-none transition focus:border-navy disabled:cursor-not-allowed disabled:opacity-60";
   const provinces = useMemo(() => getShalomProvinces(department), [department]);
   const districts = useMemo(() => getShalomDistricts(department, province), [department, province]);
   const selectedAgency = agencyOptions.find((agency) => agency.id === selectedAgencyId);
@@ -146,13 +148,13 @@ export function CheckoutForm() {
           : "";
 
   return (
-    <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1fr_380px] lg:gap-8">
+    <form onSubmit={submit} className="grid gap-5 pb-28 lg:grid-cols-[1fr_380px] lg:gap-8 lg:pb-0">
       <div className="grid gap-6">
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <div className="flex items-start gap-3">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">1</span>
-            <div>
-              <h2 className="text-lg font-semibold">Datos del cliente</h2>
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">1</span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold sm:text-lg">Datos del cliente</h2>
               <p className="mt-1 text-sm leading-6 text-ink/60">Usaremos estos datos para registrar tu pedido.</p>
             </div>
           </div>
@@ -173,9 +175,9 @@ export function CheckoutForm() {
 
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <div className="flex items-start gap-3">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">2</span>
-            <div>
-              <h2 className="text-lg font-semibold">Ubicacion de destino</h2>
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">2</span>
+            <div className="min-w-0">
+              <h2 className="text-base font-semibold sm:text-lg">Ubicacion de destino</h2>
               <p className="mt-1 text-sm leading-6 text-ink/60">
                 Selecciona departamento, provincia y distrito para encontrar las sedes Shalom mas cercanas.
               </p>
@@ -237,17 +239,17 @@ export function CheckoutForm() {
         </section>
 
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
+          <div className="grid gap-3 sm:flex sm:items-start sm:justify-between sm:gap-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white">3</span>
-              <div>
-                <h2 className="text-lg font-semibold">Agencia Shalom cercana</h2>
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">3</span>
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold sm:text-lg">Agencia Shalom cercana</h2>
                 <p className="mt-1 text-sm leading-6 text-ink/60">
                   Elige la sede donde prefieres recoger tu pedido.
                 </p>
               </div>
             </div>
-            {selectedAgency ? <span className="text-xs font-semibold uppercase tracking-[0.18em] text-olive">Seleccionada</span> : null}
+            {selectedAgency ? <span className="w-fit text-xs font-semibold uppercase tracking-[0.18em] text-olive">Seleccionada</span> : null}
           </div>
           {!district ? (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
@@ -264,11 +266,11 @@ export function CheckoutForm() {
                 {visibleAgencyOptions.map((agency) => (
                   <label
                     key={agency.id}
-                    className={`grid cursor-pointer gap-3 rounded-lg border p-4 transition sm:grid-cols-[1fr_auto] ${
-                      selectedAgencyId === agency.id ? "border-ink bg-ink text-white" : "border-ink/10 bg-white hover:border-ink/35"
+                    className={`grid cursor-pointer gap-3 rounded-lg border p-3 transition sm:grid-cols-[1fr_auto] sm:p-4 ${
+                      selectedAgencyId === agency.id ? "border-ink bg-ink text-white ring-1 ring-white/25" : "border-ink/10 bg-white hover:border-ink/35"
                     }`}
                   >
-                    <span className="flex gap-3">
+                    <span className="flex min-w-0 gap-3">
                       <input
                         required
                         type="radio"
@@ -278,8 +280,8 @@ export function CheckoutForm() {
                         onChange={() => setSelectedAgencyId(agency.id)}
                         className="mt-1"
                       />
-                      <span>
-                        <span className="flex items-center gap-2 text-sm font-semibold sm:text-base">
+                      <span className="min-w-0">
+                        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold leading-snug sm:text-base">
                           {agency.name}
                           {selectedAgencyId === agency.id ? <CheckCircle2 className="h-4 w-4" /> : null}
                         </span>
@@ -308,7 +310,7 @@ export function CheckoutForm() {
                           rel="noreferrer"
                           className={`inline-flex h-9 w-9 items-center justify-center rounded-full border ${
                             selectedAgencyId === agency.id ? "border-white/20 text-white" : "border-ink/10 text-ink"
-                          }`}
+                          } shrink-0`}
                           aria-label={`Ver mapa de ${agency.name}`}
                         >
                           <MapPin className="h-4 w-4" />
@@ -336,7 +338,7 @@ export function CheckoutForm() {
         </section>
 
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
-          <h2 className="text-lg font-semibold">Metodo de pago</h2>
+          <h2 className="text-base font-semibold sm:text-lg">Metodo de pago</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input defaultChecked type="radio" name="paymentProvider" value="mercado_pago" className="mr-2" />
@@ -375,7 +377,7 @@ export function CheckoutForm() {
             </div>
             <div className="mt-3 flex justify-between text-base font-semibold">
               <span>Total</span>
-              <span>{formatCurrency(subtotal + shipping)}</span>
+              <span>{formatCurrency(total)}</span>
             </div>
           </div>
         </div>
@@ -392,7 +394,7 @@ export function CheckoutForm() {
             <p className="mt-1 text-ink/55">{selectedAgency.address}</p>
           </div>
         ) : null}
-        <button disabled={status === "loading"} className="mt-6 min-h-12 w-full rounded-full bg-ink px-5 py-3.5 text-sm font-semibold text-white disabled:bg-ink/35">
+        <button disabled={status === "loading"} className="mt-6 hidden min-h-12 w-full rounded-full bg-ink px-5 py-3.5 text-sm font-semibold text-white disabled:bg-ink/35 lg:block">
           {status === "loading" ? "Procesando..." : "Confirmar pedido"}
         </button>
         {message ? (
@@ -401,6 +403,23 @@ export function CheckoutForm() {
           </p>
         ) : null}
       </aside>
+      {status !== "success" ? (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-black/95 px-3 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] text-white shadow-[0_-18px_50px_rgba(0,0,0,0.45)] backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-7xl items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] uppercase tracking-[0.16em] text-white/45">Total</p>
+              <p className="mt-0.5 text-lg font-semibold leading-none">{formatCurrency(total)}</p>
+              {selectedAgency ? <p className="mt-1 truncate text-xs text-white/55">{selectedAgency.name}</p> : null}
+            </div>
+            <button
+              disabled={status === "loading"}
+              className="min-h-12 shrink-0 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black disabled:bg-white/30 disabled:text-white/50"
+            >
+              {status === "loading" ? "Procesando" : "Confirmar"}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </form>
   );
 }
