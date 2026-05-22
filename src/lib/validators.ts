@@ -36,7 +36,7 @@ export const checkoutSchema = z.object({
     dni: z.string().regex(/^\d{8}$/, "DNI invalido"),
     department: z.string().min(2),
     province: z.string().min(2),
-    district: z.string().min(2),
+    district: z.string().optional().default(""),
     shalomAgencyId: z.string().min(1)
   }),
   shippingMethod: z.enum(["shalom_agency"]),

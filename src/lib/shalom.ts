@@ -1,6 +1,7 @@
 import { shalomAgencies, type ShalomAgency } from "@/lib/shalom-agencies";
 
 const collator = new Intl.Collator("es-PE", { sensitivity: "base" });
+const lowAgencyProvinceLimit = 5;
 
 export type ShalomMatchLevel = "district" | "province" | "department" | "none";
 
@@ -50,6 +51,24 @@ export function getShalomDistricts(department: string, province: string) {
   );
 }
 
+export function getShalomProvinceAgencyCount(department: string, province: string) {
+  const normalizedDepartment = normalizeLocation(department);
+  const normalizedProvince = normalizeLocation(province);
+
+  if (!normalizedDepartment || !normalizedProvince) return 0;
+
+  return shalomAgencies.filter(
+    (agency) =>
+      normalizeLocation(agency.department) === normalizedDepartment &&
+      normalizeLocation(agency.province) === normalizedProvince
+  ).length;
+}
+
+export function isShalomDistrictRequired(department: string, province: string) {
+  const count = getShalomProvinceAgencyCount(department, province);
+  return count >= lowAgencyProvinceLimit;
+}
+
 export function getShalomAgencyById(id: string) {
   return shalomAgencies.find((agency) => agency.id === id) ?? null;
 }
@@ -59,10 +78,18 @@ export function getShalomAgencyOptions(department: string, province: string, dis
   const normalizedProvince = normalizeLocation(province);
   const normalizedDistrict = normalizeLocation(district);
 
-  if (!normalizedDepartment || !normalizedProvince || !normalizedDistrict) return [];
+  if (!normalizedDepartment || !normalizedProvince) return [];
 
   const sameDepartment = shalomAgencies.filter((agency) => normalizeLocation(agency.department) === normalizedDepartment);
   const sameProvince = sameDepartment.filter((agency) => normalizeLocation(agency.province) === normalizedProvince);
+  if (!normalizedDistrict) {
+    if (!sameProvince.length || isShalomDistrictRequired(department, province)) return [];
+
+    return sameProvince
+      .map((agency) => ({ ...agency, matchLevel: "province" as const }))
+      .sort((a, b) => collator.compare(a.district, b.district) || collator.compare(a.name, b.name));
+  }
+
   const sameDistrict = sameProvince.filter((agency) => normalizeLocation(agency.district) === normalizedDistrict);
   const base = sameDistrict.length ? sameDistrict : sameProvince.length ? sameProvince : sameDepartment;
   const matchLevel: ShalomMatchLevel = sameDistrict.length

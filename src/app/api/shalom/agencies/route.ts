@@ -45,8 +45,12 @@ export async function GET(request: Request) {
   const district = searchParams.get("district") || "";
   const options = getShalomAgencyOptions(department, province, district);
 
-  if (!department || !province || !district || !options.length) {
+  if (!department || !province || !options.length) {
     return NextResponse.json({ agencies: [], geocoded: false });
+  }
+
+  if (!district) {
+    return NextResponse.json({ agencies: options, geocoded: false });
   }
 
   const location = await geocodeDistrict(department, province, district);

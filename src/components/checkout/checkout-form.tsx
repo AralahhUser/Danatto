@@ -6,8 +6,10 @@ import { CheckCircle2, MapPin } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { formatCurrency } from "@/lib/format";
 import {
+  getShalomProvinceAgencyCount,
   getShalomDistricts,
   getShalomProvinces,
+  isShalomDistrictRequired,
   shalomDepartments,
   type ShalomAgencyOption
 } from "@/lib/shalom";
@@ -30,6 +32,9 @@ export function CheckoutForm() {
     "min-h-12 w-full rounded-md border border-ink/10 bg-white px-3 py-3 text-base outline-none transition focus:border-navy disabled:cursor-not-allowed disabled:opacity-60";
   const provinces = useMemo(() => getShalomProvinces(department), [department]);
   const districts = useMemo(() => getShalomDistricts(department, province), [department, province]);
+  const provinceAgencyCount = useMemo(() => getShalomProvinceAgencyCount(department, province), [department, province]);
+  const districtRequired = useMemo(() => isShalomDistrictRequired(department, province), [department, province]);
+  const districtCanBeSkipped = Boolean(province && provinceAgencyCount > 0 && !districtRequired);
   const selectedAgency = agencyOptions.find((agency) => agency.id === selectedAgencyId);
   const matchLevel = agencyOptions[0]?.matchLevel;
   const visibleAgencyOptions = useMemo(() => {
@@ -44,7 +49,7 @@ export function CheckoutForm() {
   useEffect(() => {
     setShowAllAgencies(false);
 
-    if (!department || !province || !district) {
+    if (!department || !province || (districtRequired && !district)) {
       setAgencyOptions([]);
       setGeocoded(false);
       return;
@@ -71,7 +76,7 @@ export function CheckoutForm() {
       });
 
     return () => controller.abort();
-  }, [department, province, district]);
+  }, [department, province, district, districtRequired]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -138,9 +143,11 @@ export function CheckoutForm() {
         ? "Estas agencias corresponden al distrito indicado y se ordenan por distancia aproximada."
         : "Estas agencias corresponden al distrito indicado."
       : matchLevel === "province"
-        ? geocoded
-          ? "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia ordenadas por cercania aproximada."
-          : "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia."
+        ? districtCanBeSkipped && !district
+          ? "Esta provincia tiene pocas sedes Shalom. Puedes elegir una agencia directamente sin indicar distrito."
+          : geocoded
+            ? "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia ordenadas por cercania aproximada."
+            : "No hay agencia exacta en ese distrito. Mostramos sedes de la misma provincia."
         : matchLevel === "department"
           ? geocoded
             ? "No hay sedes en esa provincia. Mostramos opciones del mismo departamento ordenadas por cercania aproximada."
@@ -179,7 +186,7 @@ export function CheckoutForm() {
             <div className="min-w-0">
               <h2 className="text-base font-semibold sm:text-lg">Ubicacion de destino</h2>
               <p className="mt-1 text-sm leading-6 text-ink/60">
-                Selecciona departamento, provincia y distrito para encontrar las sedes Shalom mas cercanas.
+                Selecciona departamento y provincia. En provincias con varias sedes, tambien pediremos distrito.
               </p>
             </div>
           </div>
@@ -222,12 +229,12 @@ export function CheckoutForm() {
             </select>
             <input
               name="district"
-              required
+              required={districtRequired}
               value={district}
               disabled={!province}
               list="shalom-districts"
               onChange={(event) => setDistrict(event.target.value)}
-              placeholder="Distrito"
+              placeholder={districtCanBeSkipped ? "Distrito (opcional)" : "Distrito"}
               className={fieldClass}
             />
             <datalist id="shalom-districts">
@@ -236,6 +243,15 @@ export function CheckoutForm() {
               ))}
             </datalist>
           </div>
+          {districtCanBeSkipped ? (
+            <p className="mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
+              {province} tiene {provinceAgencyCount} {provinceAgencyCount === 1 ? "sede" : "sedes"} Shalom. Puedes elegir una agencia sin completar distrito.
+            </p>
+          ) : province ? (
+            <p className="mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
+              Esta provincia tiene varias sedes. Indica distrito para mostrar las mas cercanas.
+            </p>
+          ) : null}
         </section>
 
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
@@ -251,9 +267,9 @@ export function CheckoutForm() {
             </div>
             {selectedAgency ? <span className="w-fit text-xs font-semibold uppercase tracking-[0.18em] text-olive">Seleccionada</span> : null}
           </div>
-          {!district ? (
+          {!province || (districtRequired && !district) ? (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
-              Completa departamento, provincia y distrito para ver sedes Shalom cercanas.
+              {province ? "Completa el distrito para ver sedes Shalom cercanas." : "Completa departamento y provincia para ver sedes Shalom cercanas."}
             </div>
           ) : agenciesLoading ? (
             <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">

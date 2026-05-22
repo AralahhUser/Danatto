@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validators";
 import { createMercadoPagoPreference } from "@/lib/payments";
-import { getShalomAgencyById, normalizeLocation } from "@/lib/shalom";
+import { getShalomAgencyById, isShalomDistrictRequired, normalizeLocation } from "@/lib/shalom";
 
 export async function POST(request: Request) {
   const parsed = checkoutSchema.safeParse(await request.json());
@@ -17,6 +17,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Agencia Shalom invalida para el departamento seleccionado." }, { status: 400 });
   }
 
+  const district = payload.customer.district?.trim() ?? "";
+  const districtRequired = isShalomDistrictRequired(payload.customer.department, payload.customer.province);
+
+  if (districtRequired && !district) {
+    return NextResponse.json({ error: "Selecciona un distrito para ver agencias Shalom cercanas." }, { status: 400 });
+  }
+
+  if (!district && normalizeLocation(shalomAgency.province) !== normalizeLocation(payload.customer.province)) {
+    return NextResponse.json({ error: "Agencia Shalom invalida para la provincia seleccionada." }, { status: 400 });
+  }
+
   const customerData = {
     name: payload.customer.name,
     email: payload.customer.email ?? "",
@@ -24,7 +35,7 @@ export async function POST(request: Request) {
     dni: payload.customer.dni,
     address: shalomAgency.address,
     department: payload.customer.department,
-    district: payload.customer.district,
+    district,
     city: payload.customer.province,
     province: payload.customer.province,
     reference: `Recojo en agencia Shalom: ${shalomAgency.name}`,
