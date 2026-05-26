@@ -84,7 +84,7 @@ async function main() {
       description: "Denim clasico de tiro medio con desgaste natural controlado. Pieza atemporal y resistente.",
       price: 199,
       salePrice: 179,
-      brandId: brandMap.levis,
+      brandId: brandMap["levi-s"],
       categoryId: categoryMap.jeans,
       images: [image("photo-1542272604-787c3835535d"), image("photo-1541099649105-f69ad21f3246")],
       size: "32",
