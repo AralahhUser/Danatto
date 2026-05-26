@@ -84,6 +84,7 @@ MERCADO_PAGO_PUBLIC_KEY=""
 MERCADO_PAGO_WEBHOOK_SECRET=""
 MERCADO_PAGO_NOTIFICATION_URL=""
 MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
+BLOB_READ_WRITE_TOKEN=""
 CULQI_PUBLIC_KEY=""
 CULQI_PRIVATE_KEY=""
 CLOUDINARY_CLOUD_NAME=""
@@ -148,7 +149,7 @@ Culqi y Yape/Plin quedan como proveedores preparados para conectar con SDK/API r
 
 ## Imagenes
 
-El admin permite agregar varias imagenes por URL y tambien subir varias imagenes si configuras Cloudinary con `CLOUDINARY_CLOUD_NAME` y `CLOUDINARY_UPLOAD_PRESET`. No incluyas claves privadas de Cloudinary en el cliente.
+El admin permite agregar varias imagenes por URL y tambien subir archivos desde el equipo. La subida usa Vercel Blob con `BLOB_READ_WRITE_TOKEN`; Cloudinary queda como respaldo si configuras `CLOUDINARY_CLOUD_NAME` y `CLOUDINARY_UPLOAD_PRESET`. No incluyas claves privadas en el cliente.
 
 ## Pixeles
 

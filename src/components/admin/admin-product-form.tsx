@@ -145,7 +145,7 @@ export function AdminProductForm({
       <label className="grid gap-2 text-sm">
         Subir imagenes
         <input name="imageFiles" type="file" multiple accept="image/*" className="rounded-md border border-ink/10 px-3 py-3" />
-        <span className="text-xs text-ink/50">Requiere Cloudinary configurado. Tambien puedes pegar URLs arriba.</span>
+        <span className="text-xs text-ink/50">Puedes subir archivos desde tu equipo o pegar URLs arriba. Maximo 4.5 MB por imagen.</span>
       </label>
       <label className="grid gap-2 text-sm">
         Descripcion
