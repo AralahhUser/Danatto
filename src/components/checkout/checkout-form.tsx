@@ -116,13 +116,19 @@ export function CheckoutForm() {
       return;
     }
 
+    const mercadoPagoUrl = data.payment?.initPoint || data.payment?.init_point;
+
     setStatus("success");
     setMessage(
-      data.payment?.init_point
-        ? "Pedido creado. Puedes continuar con el enlace de pago."
+      mercadoPagoUrl
+        ? "Pedido creado. Te estamos llevando a Mercado Pago."
         : "Pedido creado. La pasarela queda lista al configurar las variables de entorno."
     );
     clear();
+
+    if (mercadoPagoUrl) {
+      window.location.assign(mercadoPagoUrl);
+    }
   }
 
   if (!items.length && status !== "success") {

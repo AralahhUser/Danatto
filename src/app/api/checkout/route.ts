@@ -109,6 +109,13 @@ export async function POST(request: Request) {
             message: "Proveedor preparado. Conecta las claves reales en variables de entorno."
           };
 
+    if (payload.paymentProvider === "mercado_pago" && "preferenceId" in payment && payment.preferenceId) {
+      await prisma.order.update({
+        where: { id: result.orderId },
+        data: { paymentReference: payment.preferenceId }
+      });
+    }
+
     return NextResponse.json({ ok: true, orderId: result.orderId, payment });
   } catch (error) {
     if (error instanceof Error && error.message.includes("disponible")) {

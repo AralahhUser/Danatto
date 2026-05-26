@@ -76,8 +76,12 @@ NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/danatto.store/"
 NEXT_PUBLIC_WHATSAPP_NUMBER="51912354180"
 NEXT_PUBLIC_META_PIXEL_ID=""
 NEXT_PUBLIC_TIKTOK_PIXEL_ID=""
+MERCADO_PAGO_ENVIRONMENT="sandbox"
 MERCADO_PAGO_ACCESS_TOKEN=""
 MERCADO_PAGO_PUBLIC_KEY=""
+MERCADO_PAGO_WEBHOOK_SECRET=""
+MERCADO_PAGO_NOTIFICATION_URL=""
+MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
 CULQI_PUBLIC_KEY=""
 CULQI_PRIVATE_KEY=""
 CLOUDINARY_CLOUD_NAME=""
@@ -108,9 +112,35 @@ El checkout solicita nombres completos, telefono, DNI, provincia y distrito. Con
 
 La base filtrada de agencias publicas esta en `src/lib/shalom-agencies.ts` y se genero desde la data publica de Shalom. Si actualizas la red de agencias, vuelve a regenerar ese archivo antes de desplegar.
 
-## Pagos
+## Mercado Pago
 
-Mercado Pago esta preparado en `src/lib/payments.ts`. Si `MERCADO_PAGO_ACCESS_TOKEN` existe, el checkout intenta crear una preferencia real. Si no existe, devuelve una respuesta de modo `not_configured`.
+La integracion usa Checkout Pro. El backend crea una preferencia de pago en `src/lib/payments.ts`, redirige al cliente a Mercado Pago y recibe confirmaciones en:
+
+```text
+/api/payments/mercado-pago/webhook
+```
+
+Variables necesarias:
+
+```env
+NEXT_PUBLIC_SITE_URL="https://danatto.vercel.app"
+MERCADO_PAGO_ENVIRONMENT="sandbox"
+MERCADO_PAGO_ACCESS_TOKEN="TEST-..."
+MERCADO_PAGO_PUBLIC_KEY="TEST-..."
+MERCADO_PAGO_WEBHOOK_SECRET="..."
+MERCADO_PAGO_NOTIFICATION_URL="https://danatto.vercel.app/api/payments/mercado-pago/webhook"
+MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
+```
+
+Para produccion cambia `MERCADO_PAGO_ENVIRONMENT` a `production` y usa las credenciales productivas. No coloques claves reales en el repositorio; configuralas en `.env.local` para pruebas privadas o en Environment Variables de Vercel.
+
+En Mercado Pago Developers configura el webhook de la aplicacion con evento `Pagos` apuntando a:
+
+```text
+https://danatto.vercel.app/api/payments/mercado-pago/webhook
+```
+
+Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout devuelve modo `not_configured` para que la tienda siga siendo navegable sin cobrar. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado`; si llega rechazado o cancelado, lo marca como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
 
 Culqi y Yape/Plin quedan como proveedores preparados para conectar con SDK/API real en una siguiente fase.
 
