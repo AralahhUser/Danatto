@@ -11,3 +11,4 @@ prisma/dev.db
 edge-*/
 
 .vercel
+.env*.local
