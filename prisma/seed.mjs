@@ -30,13 +30,15 @@ function slugify(input) {
 const image = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1200&q=85`;
 
 async function main() {
-  const passwordHash = await bcrypt.hash("danatto123", 12);
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@danatto.com";
+  const adminPassword = process.env.ADMIN_PASSWORD || "danatto123";
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
   await prisma.userAdmin.upsert({
-    where: { email: "admin@danatto.com" },
-    update: { passwordHash },
+    where: { email: adminEmail },
+    update: process.env.ADMIN_PASSWORD ? { passwordHash } : {},
     create: {
       name: "Admin Danatto",
-      email: "admin@danatto.com",
+      email: adminEmail,
       passwordHash,
       role: "owner"
     }

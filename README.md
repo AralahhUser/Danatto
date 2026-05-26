@@ -71,6 +71,8 @@ Copia `.env.example` a `.env` y configura:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/danatto?schema=public"
 JWT_SECRET="replace-with-a-long-random-secret"
+ADMIN_EMAIL="admin@danatto.com"
+ADMIN_PASSWORD="change-this-before-production"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/danatto.store/"
 NEXT_PUBLIC_WHATSAPP_NUMBER="51912354180"
