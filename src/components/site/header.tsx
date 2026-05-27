@@ -33,20 +33,20 @@ export function Header() {
 
   return (
     <>
-      <div className="hidden border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 sm:block sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
+      <div className="hidden border-b border-ink/10 bg-porcelain px-3 py-1.5 text-center text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-ink/55 md:block sm:px-4 sm:py-2 sm:text-[11px] sm:leading-5 sm:tracking-[0.18em]">
         <span>Ropa americana seleccionada</span>
       </div>
-      <header className="sticky top-0 z-40 border-b border-ink/10 bg-porcelain/90 backdrop-blur-xl">
-        <div className="container-page flex h-16 items-center justify-between gap-2 sm:h-24 sm:gap-4">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/95 backdrop-blur-xl md:border-ink/10 md:bg-porcelain/90">
+        <div className="container-page grid h-[calc(4rem+env(safe-area-inset-top))] grid-cols-[2.75rem_1fr_2.75rem] items-center gap-2 pt-[env(safe-area-inset-top)] md:h-24 md:grid-cols-[auto_1fr_auto] md:gap-4 md:pt-0 lg:flex lg:justify-between">
           <button
             aria-label="Abrir menu"
             onClick={() => setMobileOpen(true)}
-            className="focus-ring inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white shadow-sm md:border-ink/10 md:bg-ink lg:hidden"
+            className="focus-ring inline-flex h-11 w-11 shrink-0 items-center justify-center justify-self-start rounded-full border border-white/15 bg-white/8 text-white shadow-sm md:border-ink/10 md:bg-ink lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          <span className="md:hidden">
+          <span className="justify-self-center md:hidden">
             <Logo tone="light" compact />
           </span>
           <span className="hidden md:inline-flex">
@@ -68,22 +68,22 @@ export function Header() {
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 justify-self-end">
             <Link
               href="/shop"
               aria-label="Buscar productos"
-              className="focus-ring hidden h-11 w-11 items-center justify-center rounded-full border border-ink/10 bg-white text-ink transition hover:border-ink sm:inline-flex"
+              className="focus-ring hidden h-11 w-11 items-center justify-center rounded-full border border-ink/10 bg-white text-ink transition hover:border-ink md:inline-flex"
             >
               <Search className="h-5 w-5" />
             </Link>
             <button
               onClick={() => setCartOpen(true)}
-              className="focus-ring relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white transition hover:bg-navy sm:h-11 sm:w-11 md:border-transparent md:bg-ink"
+              className="focus-ring mobile-chip-light relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/8 text-black transition hover:bg-white/10 md:border-transparent md:bg-ink md:text-white md:hover:bg-navy"
               aria-label="Abrir carrito"
             >
               <ShoppingBag className="h-5 w-5" />
               {count > 0 ? (
-                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne px-1 text-[11px] font-semibold text-ink">
+                <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-champagne px-1 text-[11px] font-semibold text-black">
                   {count}
                 </span>
               ) : null}

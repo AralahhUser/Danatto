@@ -23,26 +23,26 @@ export default async function HomePage() {
           sizes="100vw"
           className="object-cover object-[58%_center] sm:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/92 via-black/82 to-black lg:hidden sm:from-white/95 sm:via-white/88 sm:to-white/95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/92 via-black/84 to-black lg:hidden md:from-white/95 md:via-white/88 md:to-white/95" />
         <div className="absolute inset-0 hidden bg-gradient-to-r from-porcelain via-porcelain/90 to-porcelain/20 lg:block" />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent sm:from-porcelain" />
-        <div className="container-page relative flex min-h-[420px] items-center py-9 sm:min-h-[660px] sm:py-20">
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black to-transparent md:from-porcelain sm:h-40" />
+        <div className="container-page relative flex min-h-[372px] items-center py-7 sm:min-h-[560px] sm:py-16 lg:min-h-[660px] lg:py-20">
           <div className="max-w-3xl">
-            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/62 sm:border-ink/10 sm:bg-white/75 sm:px-4 sm:text-xs sm:tracking-[0.2em] sm:text-ink/55">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/62 sm:px-4 sm:text-xs sm:tracking-[0.2em] md:border-ink/10 md:bg-white/75 md:text-ink/55">
               <Sparkles className="h-3.5 w-3.5 text-champagne sm:h-4 sm:w-4" />
               Danatto curated essentials
             </p>
-            <h1 className="mt-5 max-w-2xl text-[38px] font-semibold leading-[1] text-white sm:mt-7 sm:text-7xl sm:leading-[0.95] sm:text-ink">
+            <h1 className="mt-5 max-w-2xl text-[34px] font-semibold leading-[1] text-white min-[380px]:text-[40px] sm:mt-7 sm:text-7xl sm:leading-[0.95] sm:text-ink">
               Ropa americana seleccionada
             </h1>
-            <p className="mt-5 max-w-[22rem] text-base leading-7 text-white/76 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-8 sm:text-ink/68">
+            <p className="mt-4 max-w-[22rem] text-[15px] leading-7 text-white/76 sm:mt-7 sm:max-w-xl sm:text-lg sm:leading-8 sm:text-ink/68">
               Prendas unicas de marcas reconocidas, listas para una nueva historia.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row">
-              <Link href="/shop" className="focus-ring inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-navy sm:py-4">
+            <div className="mt-7 flex flex-col gap-3 sm:mt-10 sm:flex-row">
+              <Link href="/shop" className="focus-ring mobile-primary inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-navy sm:py-4 md:bg-ink md:text-white">
                 Comprar ahora <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/shop?sort=recent" className="focus-ring min-h-12 rounded-full border border-white/18 bg-white/5 px-7 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-white/10 sm:border-ink/20 sm:bg-white/55 sm:py-4 sm:text-ink sm:hover:bg-white">
+              <Link href="/shop?sort=recent" className="focus-ring mobile-outline min-h-12 rounded-full border border-white/18 bg-white/5 px-7 py-3.5 text-center text-sm font-semibold text-white transition hover:bg-white/10 sm:py-4 md:border-ink/20 md:bg-white/55 md:text-ink md:hover:bg-white">
                 Ver novedades
               </Link>
             </div>

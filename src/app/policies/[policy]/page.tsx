@@ -60,7 +60,7 @@ export default async function PolicyPage({ params }: PageProps) {
 
   return (
     <main className="container-page py-8 sm:py-16 lg:py-24">
-      <div className="mx-auto max-w-3xl rounded-lg border border-ink/10 bg-white p-4 sm:p-10">
+      <div className="mobile-card mx-auto max-w-3xl rounded-lg border border-ink/10 bg-white p-4 sm:p-10 md:bg-white">
         <p className="text-sm font-semibold uppercase text-olive">Politicas Danatto</p>
         <h1 className="mt-3 text-3xl font-semibold sm:text-4xl">{content.title}</h1>
         <div className="mt-6 grid gap-4 text-sm leading-7 text-ink/70 sm:mt-8 sm:gap-5 sm:text-base sm:leading-8">

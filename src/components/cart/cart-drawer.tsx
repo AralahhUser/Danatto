@@ -13,9 +13,9 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink/35" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/65 sm:bg-ink/35" onClick={onClose}>
       <aside
-        className="ml-auto flex h-full w-[min(100vw,430px)] max-w-none flex-col bg-white shadow-soft sm:max-w-md"
+        className="mobile-surface ml-auto flex h-full w-[min(100vw,430px)] max-w-none flex-col bg-white shadow-soft sm:max-w-md md:bg-white"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4 border-b border-ink/10 p-4 sm:p-5">
@@ -64,7 +64,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
               ))}
             </div>
           ) : (
-            <div className="rounded-lg bg-linen p-8 text-center">
+            <div className="mobile-soft-surface rounded-lg bg-linen p-8 text-center">
               <h3 className="font-semibold">Tu carrito esta vacio</h3>
               <p className="mt-2 text-sm text-ink/60">Explora nuevos ingresos y piezas unicas.</p>
             </div>
@@ -86,10 +86,10 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             </div>
           </div>
           <div className="mt-5 grid gap-3">
-            <Link onClick={onClose} href="/checkout" className="focus-ring min-h-12 rounded-full bg-ink px-5 py-3.5 text-center text-sm font-semibold text-white">
+            <Link onClick={onClose} href="/checkout" className="focus-ring mobile-primary min-h-12 rounded-full bg-ink px-5 py-3.5 text-center text-sm font-semibold text-white md:bg-ink md:text-white">
               Finalizar compra
             </Link>
-            <Link onClick={onClose} href="/cart" className="focus-ring min-h-12 rounded-full border border-ink px-5 py-3.5 text-center text-sm font-semibold">
+            <Link onClick={onClose} href="/cart" className="focus-ring mobile-outline min-h-12 rounded-full border border-ink px-5 py-3.5 text-center text-sm font-semibold md:text-ink">
               Ver carrito
             </Link>
           </div>

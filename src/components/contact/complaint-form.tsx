@@ -48,7 +48,7 @@ export function ComplaintForm() {
     "min-h-12 w-full rounded-md border border-ink/10 bg-white px-3 py-3 text-base outline-none transition focus:border-navy";
 
   return (
-    <form onSubmit={submit} className="grid gap-6 rounded-lg border border-ink/10 bg-white p-4 sm:p-8">
+    <form onSubmit={submit} className="mobile-card grid gap-6 rounded-lg border border-ink/10 bg-white p-4 sm:p-8 md:bg-white">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-2 text-sm">
           Tipo de solicitud
@@ -105,7 +105,7 @@ export function ComplaintForm() {
         </p>
       ) : null}
 
-      <button disabled={status === "loading"} className="min-h-12 w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white disabled:bg-ink/40 sm:w-fit">
+      <button disabled={status === "loading"} className="mobile-primary min-h-12 w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white disabled:bg-ink/40 sm:w-fit md:bg-ink md:text-white">
         {status === "loading" ? "Registrando..." : "Enviar solicitud"}
       </button>
     </form>

@@ -24,6 +24,7 @@ body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
+  min-width: 0;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
 }
@@ -60,7 +61,7 @@ textarea {
 }
 
 .section-pad {
-  @apply py-10 sm:py-16 lg:py-24;
+  @apply py-8 sm:py-16 lg:py-24;
 }
 
 @media (max-width: 767px) {
@@ -133,5 +134,66 @@ textarea {
   input::placeholder,
   textarea::placeholder {
     color: rgb(255 255 255 / 0.48) !important;
+  }
+
+  .mobile-surface {
+    background-color: #000000 !important;
+    border-color: rgb(255 255 255 / 0.14) !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-card {
+    background-color: #050505 !important;
+    border-color: rgb(255 255 255 / 0.14) !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-soft-surface {
+    background-color: rgb(255 255 255 / 0.06) !important;
+    border-color: rgb(255 255 255 / 0.12) !important;
+  }
+
+  .mobile-chip-light {
+    background-color: rgb(255 255 255 / 0.92) !important;
+    color: #050505 !important;
+    border-color: rgb(255 255 255 / 0.25) !important;
+  }
+
+  .mobile-chip-dark {
+    background-color: rgb(255 255 255 / 0.08) !important;
+    color: #ffffff !important;
+    border-color: rgb(255 255 255 / 0.16) !important;
+  }
+
+  .mobile-selected {
+    background-color: rgb(255 255 255 / 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgb(255 255 255 / 0.42) !important;
+  }
+
+  .mobile-primary {
+    background-color: #ffffff !important;
+    color: #050505 !important;
+    border-color: #ffffff !important;
+  }
+
+  .mobile-primary:disabled {
+    background-color: rgb(255 255 255 / 0.22) !important;
+    color: rgb(255 255 255 / 0.48) !important;
+    border-color: rgb(255 255 255 / 0.18) !important;
+  }
+
+  .mobile-outline {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border-color: rgb(255 255 255 / 0.22) !important;
+  }
+
+  .mobile-muted {
+    color: rgb(255 255 255 / 0.68) !important;
+  }
+
+  .mobile-safe-pad {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
   }
 }

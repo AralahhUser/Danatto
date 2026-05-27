@@ -28,9 +28,9 @@ export default function ContactPage() {
             href={whatsapp}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-[220px] flex-col justify-between rounded-lg border border-ink/10 bg-ink p-5 text-white transition hover:-translate-y-1 hover:shadow-lift sm:p-8"
+            className="mobile-card flex min-h-[200px] flex-col justify-between rounded-lg border border-ink/10 bg-ink p-5 text-white transition hover:-translate-y-1 hover:shadow-lift sm:min-h-[220px] sm:p-8 md:bg-ink"
           >
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-white text-ink">
+            <span className="mobile-chip-light grid h-12 w-12 place-items-center rounded-full bg-white text-ink md:bg-white md:text-ink">
               <MessageCircle className="h-6 w-6" />
             </span>
             <span>
@@ -48,9 +48,9 @@ export default function ContactPage() {
             href={instagram}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-[220px] flex-col justify-between rounded-lg border border-ink/10 bg-white p-5 transition hover:-translate-y-1 hover:shadow-lift sm:p-8"
+            className="mobile-card flex min-h-[200px] flex-col justify-between rounded-lg border border-ink/10 bg-white p-5 transition hover:-translate-y-1 hover:shadow-lift sm:min-h-[220px] sm:p-8 md:bg-white"
           >
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-ink text-white">
+            <span className="mobile-chip-dark grid h-12 w-12 place-items-center rounded-full bg-ink text-white md:bg-ink md:text-white">
               <Instagram className="h-6 w-6" />
             </span>
             <span>
@@ -64,12 +64,12 @@ export default function ContactPage() {
             </span>
           </a>
         </div>
-        <div className="mt-8 rounded-lg border border-ink/10 bg-white p-5">
+        <div className="mobile-card mt-8 rounded-lg border border-ink/10 bg-white p-5 md:bg-white">
           <p className="text-sm font-semibold">Libro de reclamaciones</p>
           <p className="mt-2 text-sm leading-6 text-ink/60">
             Para reclamos o quejas formales, registra tu solicitud en el formulario digital.
           </p>
-          <Link href="/complaints" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">
+          <Link href="/complaints" className="mobile-primary mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white md:bg-ink md:text-white">
             Abrir libro
           </Link>
         </div>

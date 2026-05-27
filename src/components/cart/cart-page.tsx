@@ -16,7 +16,7 @@ export function CartPage() {
         <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Tu carrito</h1>
       </div>
       <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:gap-8">
-        <div className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+        <div className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           {items.length ? (
             <div className="grid gap-5">
               {items.map((item) => (
@@ -52,13 +52,13 @@ export function CartPage() {
             <div className="py-16 text-center">
               <h2 className="text-xl font-semibold">Aun no agregaste prendas</h2>
               <p className="mt-2 text-ink/60">Cada pieza es unica, asi que vale mirar los nuevos ingresos.</p>
-              <Link href="/shop" className="mt-6 inline-flex min-h-12 items-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">
+              <Link href="/shop" className="mobile-primary mt-6 inline-flex min-h-12 items-center rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white md:bg-ink md:text-white">
                 Ir a tienda
               </Link>
             </div>
           )}
         </div>
-        <aside className="h-fit rounded-lg border border-ink/10 bg-white p-4 sm:p-6 lg:sticky lg:top-28">
+        <aside className="mobile-card h-fit rounded-lg border border-ink/10 bg-white p-4 sm:p-6 lg:sticky lg:top-28 md:bg-white">
           <h2 className="text-lg font-semibold">Resumen</h2>
           <div className="mt-5 grid gap-3 text-sm">
             <div className="flex justify-between">
@@ -76,7 +76,7 @@ export function CartPage() {
               </div>
             </div>
           </div>
-          <Link href="/checkout" className="mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-navy px-5 py-3.5 text-sm font-semibold text-white">
+          <Link href="/checkout" className="mobile-primary mt-6 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-navy px-5 py-3.5 text-sm font-semibold text-white md:bg-navy md:text-white">
             Finalizar compra
           </Link>
         </aside>

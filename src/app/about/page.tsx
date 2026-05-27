@@ -25,7 +25,7 @@ export default function AboutPage() {
             potencial de uso.
           </p>
         </div>
-        <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-white sm:rounded-lg">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-950 sm:rounded-lg md:bg-white">
           <Image
             src="https://images.unsplash.com/photo-1523381294911-8d3cead13475?auto=format&fit=crop&w=1400&q=85"
             alt="Seleccion de prendas Danatto"
@@ -42,7 +42,7 @@ export default function AboutPage() {
             ["Autenticidad", "Priorizamos marcas reconocidas, durabilidad y estilo atemporal."],
             ["Orden", "Publicamos medidas, estado y observaciones para comprar con seguridad."]
           ].map(([title, body]) => (
-            <div key={title} className="rounded-lg border border-ink/10 p-4 sm:p-6">
+            <div key={title} className="mobile-card rounded-lg border border-ink/10 p-4 sm:p-6">
               <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
               <p className="mt-3 text-sm leading-6 text-ink/65">{body}</p>
             </div>

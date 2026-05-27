@@ -38,17 +38,17 @@ export default async function ProductPage({ params }: PageProps) {
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   return (
-    <main className="container-page py-8 sm:py-16 lg:py-24">
-      <div className="grid gap-7 sm:gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+    <main className="container-page py-5 sm:py-16 lg:py-24">
+      <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <ProductGallery images={product.images} name={product.name} />
         <section>
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <ConditionBadge condition={product.condition} />
             {product.isUniquePiece ? (
-              <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">Unica pieza</span>
+              <span className="mobile-chip-dark rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white md:bg-ink md:text-white">Unica pieza</span>
             ) : null}
             {product.isNewArrival ? (
-              <span className="rounded-full bg-champagne/20 px-3 py-1 text-xs font-semibold text-navy">Nuevo ingreso</span>
+              <span className="rounded-full bg-champagne/20 px-3 py-1 text-xs font-semibold text-white md:text-navy">Nuevo ingreso</span>
             ) : null}
           </div>
           <p className="text-sm font-semibold uppercase text-ink/45">{product.brand.name}</p>
@@ -66,13 +66,13 @@ export default async function ProductPage({ params }: PageProps) {
               ["Categoria", product.category.name],
               ["Stock", product.stock === 1 ? "1 unidad" : `${product.stock} unidades`]
             ].map(([label, value]) => (
-              <div key={label} className="rounded-lg border border-ink/10 bg-white p-3 sm:p-4">
+              <div key={label} className="mobile-card rounded-lg border border-ink/10 bg-white p-3 sm:p-4 md:bg-white">
                 <p className="text-[10px] uppercase tracking-[0.08em] text-ink/40 sm:text-xs sm:tracking-normal">{label}</p>
                 <p className="mt-1 text-sm font-semibold capitalize sm:text-base">{value}</p>
               </div>
             ))}
           </div>
-          <div className="mt-6 rounded-lg border border-olive/20 bg-olive/10 p-4 text-sm text-olive">
+          <div className="mobile-soft-surface mt-6 rounded-lg border border-olive/20 bg-olive/10 p-4 text-sm text-olive">
             Cada prenda es unica. Solo hay una unidad disponible, salvo que el administrador indique stock adicional.
           </div>
           <div className="mt-6 grid gap-3">
@@ -82,13 +82,13 @@ export default async function ProductPage({ params }: PageProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noreferrer"
-              className="focus-ring inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-ink px-6 py-3.5 text-sm font-semibold sm:py-4"
+              className="focus-ring mobile-outline inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-ink px-6 py-3.5 text-sm font-semibold sm:py-4 md:text-ink"
             >
               <MessageCircle className="h-5 w-5" />
               Consultar por WhatsApp
             </a>
           </div>
-          <div className="mt-8 divide-y divide-ink/10 rounded-lg border border-ink/10 bg-white">
+          <div className="mobile-card mt-8 divide-y divide-ink/10 rounded-lg border border-ink/10 bg-white md:bg-white">
             <InfoBlock icon={<Ruler className="h-5 w-5" />} title="Medidas aproximadas">
               <dl className="grid gap-2 text-sm text-ink/65 sm:grid-cols-2">
                 {Object.entries(product.measurements).map(([key, value]) =>

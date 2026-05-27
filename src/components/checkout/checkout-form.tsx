@@ -133,10 +133,10 @@ export function CheckoutForm() {
 
   if (!items.length && status !== "success") {
     return (
-      <div className="rounded-lg border border-ink/10 bg-white p-10 text-center">
+      <div className="mobile-card rounded-lg border border-ink/10 bg-white p-8 text-center sm:p-10 md:bg-white">
         <h1 className="text-2xl font-semibold">Tu carrito esta vacio</h1>
         <p className="mt-2 text-ink/60">Agrega una prenda unica antes de finalizar compra.</p>
-        <Link href="/shop" className="mt-6 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white">
+        <Link href="/shop" className="mobile-primary mt-6 inline-flex rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white md:bg-ink md:text-white">
           Ir a tienda
         </Link>
       </div>
@@ -163,9 +163,9 @@ export function CheckoutForm() {
   return (
     <form onSubmit={submit} className="grid gap-5 pb-28 lg:grid-cols-[1fr_380px] lg:gap-8 lg:pb-0">
       <div className="grid gap-6">
-        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+        <section className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           <div className="flex items-start gap-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">1</span>
+            <span className="mobile-primary grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm md:bg-ink md:text-white">1</span>
             <div className="min-w-0">
               <h2 className="text-base font-semibold sm:text-lg">Datos del cliente</h2>
               <p className="mt-1 text-sm leading-6 text-ink/60">Usaremos estos datos para registrar tu pedido.</p>
@@ -186,9 +186,9 @@ export function CheckoutForm() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+        <section className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           <div className="flex items-start gap-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">2</span>
+            <span className="mobile-primary grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm md:bg-ink md:text-white">2</span>
             <div className="min-w-0">
               <h2 className="text-base font-semibold sm:text-lg">Ubicacion de destino</h2>
               <p className="mt-1 text-sm leading-6 text-ink/60">
@@ -250,20 +250,20 @@ export function CheckoutForm() {
             </datalist>
           </div>
           {districtCanBeSkipped ? (
-            <p className="mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
+            <p className="mobile-soft-surface mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
               {province} tiene {provinceAgencyCount} {provinceAgencyCount === 1 ? "sede" : "sedes"} Shalom. Puedes elegir una agencia sin completar distrito.
             </p>
           ) : province ? (
-            <p className="mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
+            <p className="mobile-soft-surface mt-3 rounded-lg bg-linen/60 p-3 text-sm text-ink/60">
               Esta provincia tiene varias sedes. Indica distrito para mostrar las mas cercanas.
             </p>
           ) : null}
         </section>
 
-        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+        <section className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           <div className="grid gap-3 sm:flex sm:items-start sm:justify-between sm:gap-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm">3</span>
+              <span className="mobile-primary grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white sm:h-8 sm:w-8 sm:text-sm md:bg-ink md:text-white">3</span>
               <div className="min-w-0">
                 <h2 className="text-base font-semibold sm:text-lg">Agencia Shalom cercana</h2>
                 <p className="mt-1 text-sm leading-6 text-ink/60">
@@ -274,22 +274,22 @@ export function CheckoutForm() {
             {selectedAgency ? <span className="w-fit text-xs font-semibold uppercase tracking-[0.18em] text-olive">Seleccionada</span> : null}
           </div>
           {!province || (districtRequired && !district) ? (
-            <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
+            <div className="mobile-soft-surface mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
               {province ? "Completa el distrito para ver sedes Shalom cercanas." : "Completa departamento y provincia para ver sedes Shalom cercanas."}
             </div>
           ) : agenciesLoading ? (
-            <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
+            <div className="mobile-soft-surface mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
               Buscando agencias Shalom cercanas...
             </div>
           ) : agencyOptions.length ? (
             <div className="mt-5 grid gap-3">
-              {agencyNotice ? <p className="rounded-lg bg-linen/60 p-3 text-sm text-ink/60">{agencyNotice}</p> : null}
+              {agencyNotice ? <p className="mobile-soft-surface rounded-lg bg-linen/60 p-3 text-sm text-ink/60">{agencyNotice}</p> : null}
               <div className="grid max-h-[460px] gap-3 overflow-y-auto pr-1">
                 {visibleAgencyOptions.map((agency) => (
                   <label
                     key={agency.id}
                     className={`grid cursor-pointer gap-3 rounded-lg border p-3 transition sm:grid-cols-[1fr_auto] sm:p-4 ${
-                      selectedAgencyId === agency.id ? "border-ink bg-ink text-white ring-1 ring-white/25" : "border-ink/10 bg-white hover:border-ink/35"
+                      selectedAgencyId === agency.id ? "mobile-selected border-ink bg-ink text-white ring-1 ring-white/25" : "mobile-card border-ink/10 bg-white hover:border-ink/35 md:bg-white"
                     }`}
                   >
                     <span className="flex min-w-0 gap-3">
@@ -316,7 +316,7 @@ export function CheckoutForm() {
                       </span>
                     </span>
                     <span className="flex items-start justify-between gap-3 sm:justify-end">
-                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedAgencyId === agency.id ? "bg-white/10 text-white" : "bg-linen text-ink/65"}`}>
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${selectedAgencyId === agency.id ? "mobile-chip-dark bg-white/10 text-white" : "mobile-chip-dark bg-linen text-ink/65 md:bg-linen md:text-ink/65"}`}>
                         {typeof agency.distanceKm === "number"
                           ? `${agency.distanceKm.toFixed(1)} km aprox.`
                           : agency.matchLevel === "district"
@@ -353,13 +353,13 @@ export function CheckoutForm() {
               ) : null}
             </div>
           ) : (
-            <div className="mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
+            <div className="mobile-soft-surface mt-5 rounded-lg border border-dashed border-ink/15 bg-linen/40 p-5 text-sm text-ink/60">
               No encontramos agencias para esa ubicacion. Prueba con una provincia o distrito cercano.
             </div>
           )}
         </section>
 
-        <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
+        <section className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           <h2 className="text-base font-semibold sm:text-lg">Metodo de pago</h2>
           <div className="mt-5 grid gap-4">
             <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
@@ -369,7 +369,7 @@ export function CheckoutForm() {
           </div>
         </section>
       </div>
-      <aside className="h-fit rounded-lg border border-ink/10 bg-white p-4 sm:p-6 lg:sticky lg:top-28">
+      <aside className="mobile-card h-fit rounded-lg border border-ink/10 bg-white p-4 sm:p-6 lg:sticky lg:top-28 md:bg-white">
         <h2 className="text-lg font-semibold">Resumen</h2>
         <div className="mt-5 grid gap-3 text-sm">
           {items.map((item) => (
@@ -396,13 +396,13 @@ export function CheckoutForm() {
           </div>
         </div>
         {department || province || district ? (
-          <div className="mt-5 rounded-lg bg-linen/60 p-4 text-sm">
+          <div className="mobile-soft-surface mt-5 rounded-lg bg-linen/60 p-4 text-sm">
             <p className="font-semibold">Destino</p>
             <p className="mt-1 text-ink/65">{[department, province, district].filter(Boolean).join(" / ")}</p>
           </div>
         ) : null}
         {selectedAgency ? (
-          <div className="mt-3 rounded-lg bg-linen/60 p-4 text-sm">
+          <div className="mobile-soft-surface mt-3 rounded-lg bg-linen/60 p-4 text-sm">
             <p className="font-semibold">Recojo en Shalom</p>
             <p className="mt-1 text-ink/65">{selectedAgency.name}</p>
             <p className="mt-1 text-ink/55">{selectedAgency.address}</p>
@@ -427,7 +427,7 @@ export function CheckoutForm() {
             </div>
             <button
               disabled={status === "loading"}
-              className="min-h-12 shrink-0 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black disabled:bg-white/30 disabled:text-white/50"
+              className="mobile-primary min-h-12 shrink-0 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black disabled:bg-white/30 disabled:text-white/50"
             >
               {status === "loading" ? "Procesando" : "Confirmar"}
             </button>

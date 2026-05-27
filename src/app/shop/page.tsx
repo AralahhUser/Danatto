@@ -18,22 +18,22 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
   return (
     <main>
       <section className="border-b border-ink/10 bg-porcelain">
-        <div className="container-page py-10 sm:py-20">
-          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="container-page py-7 sm:py-14 lg:py-20">
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-olive sm:text-xs sm:tracking-[0.2em]">Catalogo curado</p>
-              <h1 className="mt-3 text-3xl font-semibold leading-tight sm:text-6xl">Tienda Danatto</h1>
+              <h1 className="mt-2 text-[32px] font-semibold leading-tight sm:mt-3 sm:text-6xl">Tienda Danatto</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/65 sm:mt-4 sm:text-base">
                 Explora prendas seleccionadas, piezas unicas y nuevos ingresos listos para una nueva historia.
               </p>
             </div>
-            <p className="w-fit rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-semibold text-ink/60 sm:text-sm">
+            <p className="mobile-chip-dark w-fit rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-semibold text-ink/60 sm:text-sm md:bg-white md:text-ink/60">
               {products.length} prendas disponibles
             </p>
           </div>
         </div>
       </section>
-      <section className="container-page py-8 sm:py-16 lg:py-24">
+      <section className="container-page py-6 sm:py-16 lg:py-24">
         <div className="grid gap-6">
           <ProductGrid products={products} />
         </div>

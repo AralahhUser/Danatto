@@ -41,8 +41,8 @@ export default async function CheckoutStatusPage({ searchParams }: { searchParam
   const paymentId = asString(values.payment_id);
 
   return (
-    <main className="container-page py-10 sm:py-20">
-      <section className="mx-auto max-w-2xl rounded-lg border border-ink/10 bg-white p-6 text-center shadow-sm sm:p-10">
+    <main className="container-page py-8 sm:py-20">
+      <section className="mobile-card mx-auto max-w-2xl rounded-lg border border-ink/10 bg-white p-5 text-center shadow-sm sm:p-10 md:bg-white">
         <span className={`mx-auto grid h-14 w-14 place-items-center rounded-full ${copy.className}`}>
           <Icon className="h-7 w-7" />
         </span>
@@ -51,7 +51,7 @@ export default async function CheckoutStatusPage({ searchParams }: { searchParam
         <p className="mt-4 text-sm leading-6 text-ink/65 sm:text-base">{copy.body}</p>
 
         {order || paymentId ? (
-          <div className="mt-6 rounded-lg bg-linen/60 p-4 text-left text-sm text-ink/65">
+          <div className="mobile-soft-surface mt-6 rounded-lg bg-linen/60 p-4 text-left text-sm text-ink/65">
             {order ? (
               <p>
                 <span className="font-semibold text-ink">Pedido:</span> {order}
@@ -66,14 +66,14 @@ export default async function CheckoutStatusPage({ searchParams }: { searchParam
         ) : null}
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <Link href="/shop" className="inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white">
+          <Link href="/shop" className="mobile-primary inline-flex min-h-12 items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white md:bg-ink md:text-white">
             Volver a tienda
           </Link>
           <a
             href="https://wa.me/51912354180"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-ink/10 px-5 py-3 text-sm font-semibold text-ink"
+            className="mobile-outline inline-flex min-h-12 items-center justify-center rounded-full border border-ink/10 px-5 py-3 text-sm font-semibold text-ink"
           >
             Consultar por WhatsApp
           </a>
