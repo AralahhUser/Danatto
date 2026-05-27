@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ArrowUpRight, Instagram, MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -62,6 +63,15 @@ export default function ContactPage() {
               Abrir Instagram <ArrowUpRight className="h-4 w-4" />
             </span>
           </a>
+        </div>
+        <div className="mt-8 rounded-lg border border-ink/10 bg-white p-5">
+          <p className="text-sm font-semibold">Libro de reclamaciones</p>
+          <p className="mt-2 text-sm leading-6 text-ink/60">
+            Para reclamos o quejas formales, registra tu solicitud en el formulario digital.
+          </p>
+          <Link href="/complaints" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-ink px-5 py-2 text-sm font-semibold text-white">
+            Abrir libro
+          </Link>
         </div>
       </div>
     </main>

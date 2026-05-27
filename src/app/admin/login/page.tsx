@@ -39,9 +39,7 @@ export default function AdminLoginPage() {
         <div className="mt-8">
           <p className="text-sm font-semibold uppercase text-olive">Admin</p>
           <h1 className="mt-2 text-3xl font-semibold">Ingresar a Danatto</h1>
-          <p className="mt-2 text-sm text-ink/60">
-            Usa el administrador creado por seed. En demo: admin@danatto.com / danatto123.
-          </p>
+          <p className="mt-2 text-sm text-ink/60">Acceso privado para gestionar productos, pedidos y clientes.</p>
         </div>
         <form onSubmit={submit} className="mt-6 grid gap-4">
           <input name="email" type="email" required placeholder="Correo" className="rounded-md border border-ink/10 px-3 py-3" />

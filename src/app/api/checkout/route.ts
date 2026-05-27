@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validators";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { getShalomAgencyById, isShalomDistrictRequired, normalizeLocation } from "@/lib/shalom";
+import { getReservationExpiration, releaseOrderReservation } from "@/lib/orders";
 
 export async function POST(request: Request) {
   const parsed = checkoutSchema.safeParse(await request.json());
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
       const ids = payload.items.map((item) => item.productId);
       const products = await tx.product.findMany({ where: { id: { in: ids } } });
       if (products.length !== payload.items.length) throw new Error("Uno o mas productos no existen.");
+      const reservationExpiresAt = getReservationExpiration();
 
       let subtotal = 0;
       for (const item of payload.items) {
@@ -61,6 +63,24 @@ export async function POST(request: Request) {
           throw new Error("Una prenda ya no esta disponible.");
         }
         subtotal += Number(product.salePrice ?? product.price) * item.quantity;
+      }
+
+      for (const item of payload.items) {
+        const product = products.find((entry) => entry.id === item.productId)!;
+        const remaining = product.stock - item.quantity;
+        const reserved = await tx.product.updateMany({
+          where: {
+            id: product.id,
+            status: "disponible",
+            stock: { gte: item.quantity }
+          },
+          data: {
+            stock: { decrement: item.quantity },
+            status: remaining <= 0 ? "reservado" : product.status
+          }
+        });
+
+        if (reserved.count !== 1) throw new Error("Una prenda ya no esta disponible.");
       }
 
       const customer = await tx.customer.create({ data: customerData });
@@ -72,6 +92,7 @@ export async function POST(request: Request) {
           paymentProvider: payload.paymentProvider,
           paymentStatus: "pendiente",
           shippingStatus: "pendiente",
+          reservationExpiresAt,
           items: {
             create: payload.items.map((item) => {
               const product = products.find((entry) => entry.id === item.productId)!;
@@ -85,36 +106,28 @@ export async function POST(request: Request) {
         }
       });
 
-      for (const item of payload.items) {
-        const product = products.find((entry) => entry.id === item.productId)!;
-        const remaining = product.stock - item.quantity;
-        await tx.product.update({
-          where: { id: product.id },
-          data: {
-            stock: Math.max(remaining, 0),
-            status: remaining <= 0 ? "vendido" : product.status
-          }
-        });
-      }
-
-      return { orderId: order.id, total: subtotal + shippingCost };
+      return { orderId: order.id, total: subtotal + shippingCost, reservationExpiresAt };
     });
 
-    const payment =
-      payload.paymentProvider === "mercado_pago"
-        ? await createMercadoPagoPreference({ orderId: result.orderId, total: result.total, payload })
-        : {
-            provider: payload.paymentProvider,
-            mode: "prepared",
-            message: "Proveedor preparado. Conecta las claves reales en variables de entorno."
-          };
+    const payment = await createMercadoPagoPreference({
+      orderId: result.orderId,
+      total: result.total,
+      payload,
+      expiresAt: result.reservationExpiresAt
+    });
 
-    if (payload.paymentProvider === "mercado_pago" && "preferenceId" in payment && payment.preferenceId) {
-      await prisma.order.update({
-        where: { id: result.orderId },
-        data: { paymentReference: payment.preferenceId }
-      });
+    if (!("initPoint" in payment) || !payment.initPoint || !payment.preferenceId) {
+      await releaseOrderReservation(result.orderId);
+      return NextResponse.json(
+        { error: payment.message || "No se pudo crear el pago con Mercado Pago.", payment },
+        { status: 502 }
+      );
     }
+
+    await prisma.order.update({
+      where: { id: result.orderId },
+      data: { paymentReference: payment.preferenceId }
+    });
 
     return NextResponse.json({ ok: true, orderId: result.orderId, payment });
   } catch (error) {
@@ -122,17 +135,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
 
-    return NextResponse.json(
-      {
-        ok: true,
-        orderId: `demo-${Date.now()}`,
-        payment: {
-          provider: payload.paymentProvider,
-          mode: "demo",
-          message: "Pedido simulado porque la base de datos no esta conectada."
-        }
-      },
-      { status: 200 }
-    );
+    console.error("Checkout error", error);
+    return NextResponse.json({ error: "No se pudo registrar el pedido. Intentalo nuevamente." }, { status: 500 });
   }
 }

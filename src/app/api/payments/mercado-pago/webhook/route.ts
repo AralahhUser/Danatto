@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getMercadoPagoPayment, mapMercadoPagoPaymentStatus } from "@/lib/payments";
+import { markOrderAsPaid, releaseOrderReservation } from "@/lib/orders";
 
 export const runtime = "nodejs";
 
@@ -58,24 +59,34 @@ export async function POST(request: Request) {
   try {
     const payment = await getMercadoPagoPayment(paymentId);
     const orderId = payment.external_reference || payment.metadata?.order_id || payment.metadata?.orderId;
+    const mappedStatus = mapMercadoPagoPaymentStatus(payment.status);
+    const paymentReference = String(payment.id);
 
     if (!orderId) {
       return NextResponse.json({ ok: true, ignored: true, reason: "Pago sin referencia de pedido" });
     }
 
-    await prisma.order.update({
-      where: { id: orderId },
-      data: {
-        paymentStatus: mapMercadoPagoPaymentStatus(payment.status),
-        paymentReference: String(payment.id)
-      }
-    });
+    if (mappedStatus === "pagado") {
+      await markOrderAsPaid(orderId, paymentReference);
+    } else if (mappedStatus === "fallido") {
+      await releaseOrderReservation(orderId, paymentReference);
+    } else {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: {
+          paymentStatus: mappedStatus,
+          paymentReference,
+          ...(mappedStatus === "pendiente" ? {} : { reservationExpiresAt: null })
+        }
+      });
+    }
 
     return NextResponse.json({
       ok: true,
       orderId,
-      paymentId: String(payment.id),
-      paymentStatus: payment.status
+      paymentId: paymentReference,
+      paymentStatus: payment.status,
+      orderPaymentStatus: mappedStatus
     });
   } catch (error) {
     console.error("Mercado Pago webhook error", error);

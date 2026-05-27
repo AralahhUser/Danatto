@@ -31,18 +31,23 @@ const image = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=
 
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@danatto.com";
-  const adminPassword = process.env.ADMIN_PASSWORD || "danatto123";
-  const passwordHash = await bcrypt.hash(adminPassword, 12);
-  await prisma.userAdmin.upsert({
-    where: { email: adminEmail },
-    update: process.env.ADMIN_PASSWORD ? { passwordHash } : {},
-    create: {
-      name: "Admin Danatto",
-      email: adminEmail,
-      passwordHash,
-      role: "owner"
-    }
-  });
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (adminPassword) {
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await prisma.userAdmin.upsert({
+      where: { email: adminEmail },
+      update: { passwordHash },
+      create: {
+        name: "Admin Danatto",
+        email: adminEmail,
+        passwordHash,
+        role: "owner"
+      }
+    });
+  } else {
+    console.warn("ADMIN_PASSWORD no configurado. Se omitio la creacion/actualizacion del usuario admin.");
+  }
 
   for (const name of brands) {
     await prisma.brand.upsert({

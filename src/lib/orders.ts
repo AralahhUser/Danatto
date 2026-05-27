@@ -1,0 +1,108 @@
+import { prisma } from "@/lib/db";
+
+type OrderItemForStock = {
+  quantity: number;
+  product: {
+    id: string;
+    stock: number;
+    status: string;
+  };
+};
+
+export const orderReservationMinutes = Number(process.env.ORDER_RESERVATION_MINUTES || 30);
+
+export function getReservationExpiration() {
+  return new Date(Date.now() + orderReservationMinutes * 60 * 1000);
+}
+
+export async function markOrderAsPaid(orderId: string, paymentReference?: string) {
+  await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: { include: { product: true } } }
+    });
+
+    if (!order) return;
+    if (order.paymentStatus === "pagado") return;
+
+    const updated = await tx.order.updateMany({
+      where: { id: order.id, paymentStatus: { in: ["pendiente", "fallido"] } },
+      data: {
+        paymentStatus: "pagado",
+        ...(paymentReference ? { paymentReference } : {}),
+        reservationExpiresAt: null
+      }
+    });
+
+    if (updated.count !== 1) return;
+
+    for (const item of order.items as unknown as OrderItemForStock[]) {
+      if (item.product.status === "reservado" || item.product.stock <= 0) {
+        await tx.product.update({
+          where: { id: item.product.id },
+          data: { status: "vendido", stock: 0 }
+        });
+      } else if (item.product.status === "disponible" && item.product.stock >= item.quantity) {
+        const remaining = item.product.stock - item.quantity;
+        await tx.product.update({
+          where: { id: item.product.id },
+          data: {
+            stock: remaining,
+            status: remaining <= 0 ? "vendido" : "disponible"
+          }
+        });
+      }
+    }
+  });
+}
+
+export async function releaseOrderReservation(orderId: string, paymentReference?: string) {
+  await prisma.$transaction(async (tx) => {
+    const order = await tx.order.findUnique({
+      where: { id: orderId },
+      include: { items: { include: { product: true } } }
+    });
+
+    if (!order || order.paymentStatus !== "pendiente") return;
+
+    const updated = await tx.order.updateMany({
+      where: { id: order.id, paymentStatus: "pendiente" },
+      data: {
+        paymentStatus: "fallido",
+        shippingStatus: "cancelado",
+        ...(paymentReference ? { paymentReference } : {}),
+        reservationExpiresAt: null
+      }
+    });
+
+    if (updated.count !== 1) return;
+
+    for (const item of order.items as unknown as OrderItemForStock[]) {
+      if (item.product.status === "reservado" || item.product.stock === 0) {
+        await tx.product.update({
+          where: { id: item.product.id },
+          data: {
+            stock: { increment: item.quantity },
+            status: "disponible"
+          }
+        });
+      }
+    }
+  });
+}
+
+export async function releaseExpiredReservations() {
+  const expiredOrders = await prisma.order.findMany({
+    where: {
+      paymentStatus: "pendiente",
+      reservationExpiresAt: { lt: new Date() }
+    },
+    select: { id: true }
+  });
+
+  for (const order of expiredOrders) {
+    await releaseOrderReservation(order.id);
+  }
+
+  return expiredOrders.length;
+}

@@ -22,19 +22,8 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 8
     });
     return response;
-  } catch {
-    if (email === "admin@danatto.com" && password === "danatto123") {
-      const token = await signAdminSession({ id: "demo-admin", email, role: "owner" });
-      const response = NextResponse.json({ ok: true, demo: true });
-      response.cookies.set(sessionCookieName, token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: shouldUseSecureCookies(),
-        path: "/",
-        maxAge: 60 * 60 * 8
-      });
-      return response;
-    }
+  } catch (error) {
+    console.error("Admin login error", error);
     return NextResponse.json({ error: "Base de datos no disponible o credenciales invalidas" }, { status: 503 });
   }
 }

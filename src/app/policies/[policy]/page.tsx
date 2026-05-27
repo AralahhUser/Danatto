@@ -39,7 +39,7 @@ const policies = {
     body: [
       "Los datos del cliente se usan para gestionar pedidos, pagos, envios y atencion postventa.",
       "No se deben almacenar claves privadas ni datos sensibles de tarjetas dentro del sistema.",
-      "Las integraciones de pagos se configuran mediante proveedores externos como Mercado Pago o Culqi."
+      "Los pagos se procesan mediante Mercado Pago. Danatto no almacena datos completos de tarjetas."
     ]
   }
 };

@@ -22,11 +22,13 @@ export type MercadoPagoPayment = {
 export async function createMercadoPagoPreference({
   orderId,
   total,
-  payload
+  payload,
+  expiresAt
 }: {
   orderId: string;
   total: number;
   payload: CheckoutPayload;
+  expiresAt?: Date;
 }) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const siteUrl = getSiteUrl();
@@ -36,7 +38,7 @@ export async function createMercadoPagoPreference({
     return {
       provider: "mercado_pago",
       mode: "not_configured",
-      message: "Mercado Pago esta preparado. Agrega MERCADO_PAGO_ACCESS_TOKEN para crear preferencias reales."
+      message: "Mercado Pago no esta configurado. Agrega MERCADO_PAGO_ACCESS_TOKEN para crear preferencias reales."
     };
   }
 
@@ -74,6 +76,13 @@ export async function createMercadoPagoPreference({
         pending: `${siteUrl}/checkout/status?result=pending&order=${orderId}`
       },
       auto_return: "approved",
+      ...(expiresAt
+        ? {
+            expires: true,
+            expiration_date_from: new Date().toISOString(),
+            expiration_date_to: expiresAt.toISOString()
+          }
+        : {}),
       notification_url: notificationUrl,
       statement_descriptor: process.env.MERCADO_PAGO_STATEMENT_DESCRIPTOR || "DANATTO",
       metadata: {
@@ -131,5 +140,5 @@ export function mapMercadoPagoPaymentStatus(status?: string): "pendiente" | "pag
 }
 
 function getSiteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.com").replace(/\/$/, "");
 }

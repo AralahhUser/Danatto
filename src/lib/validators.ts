@@ -40,7 +40,7 @@ export const checkoutSchema = z.object({
     shalomAgencyId: z.string().min(1)
   }),
   shippingMethod: z.enum(["shalom_agency"]),
-  paymentProvider: z.enum(["mercado_pago", "culqi", "yape_plin"]),
+  paymentProvider: z.enum(["mercado_pago"]),
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1)
 });
 
@@ -70,4 +70,21 @@ export const couponSchema = z.object({
   discountValue: z.coerce.number().positive(),
   expiresAt: z.string().optional().nullable(),
   active: z.boolean().default(true)
+});
+
+export const complaintSchema = z.object({
+  type: z.enum(["reclamo", "queja"]),
+  fullName: z.string().min(3),
+  document: z.string().min(8).max(12),
+  email: z.string().email(),
+  phone: z.string().min(7).max(15),
+  address: z.string().optional().or(z.literal("")),
+  orderNumber: z.string().optional().or(z.literal("")),
+  amount: z.preprocess(
+    (value) => (value === "" || value === undefined ? null : value),
+    z.coerce.number().nonnegative().nullable()
+  ),
+  product: z.string().min(3),
+  detail: z.string().min(10),
+  request: z.string().min(5)
 });

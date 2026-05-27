@@ -4,7 +4,7 @@ import { RootShell } from "@/components/site/root-shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.com"),
   title: {
     default: "Danatto | Ropa americana seleccionada",
     template: "%s | Danatto"
@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Danatto | Ropa americana seleccionada",
     description: "Prendas unicas, estilo autentico y calidad de marca.",
+    url: "/",
     type: "website"
   }
 };

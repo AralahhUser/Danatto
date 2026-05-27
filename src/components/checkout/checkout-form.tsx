@@ -361,18 +361,10 @@ export function CheckoutForm() {
 
         <section className="rounded-lg border border-ink/10 bg-white p-4 sm:p-6">
           <h2 className="text-base font-semibold sm:text-lg">Metodo de pago</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid gap-4">
             <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
               <input defaultChecked type="radio" name="paymentProvider" value="mercado_pago" className="mr-2" />
               Mercado Pago
-            </label>
-            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
-              <input type="radio" name="paymentProvider" value="culqi" className="mr-2" />
-              Culqi
-            </label>
-            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:col-span-2 sm:text-base">
-              <input type="radio" name="paymentProvider" value="yape_plin" className="mr-2" />
-              Yape/Plin manual
             </label>
           </div>
         </section>

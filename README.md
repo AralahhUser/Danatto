@@ -9,7 +9,7 @@ Tienda online premium para ropa americana seleccionada de segunda mano. Incluye 
 - Prisma ORM
 - PostgreSQL
 - Auth admin con cookie JWT
-- Pagos preparados para Mercado Pago, Culqi y Yape/Plin manual
+- Pagos reales con Mercado Pago Checkout Pro
 - Imagenes optimizadas con `next/image`
 - Hosting pensado para Vercel
 
@@ -17,13 +17,13 @@ Tienda online premium para ropa americana seleccionada de segunda mano. Incluye 
 
 - `/`
 - `/shop`
-- `/shop?brand=ralph-lauren`
-- `/shop?category=camisas`
+- `/shop?sort=recent`
 - `/product/[slug]`
 - `/cart`
 - `/checkout`
 - `/about`
 - `/contact`
+- `/complaints`
 - `/policies/shipping`
 - `/policies/returns`
 - `/policies/product-condition`
@@ -43,6 +43,7 @@ Tienda online premium para ropa americana seleccionada de segunda mano. Incluye 
 - `/admin/categories`
 - `/admin/banners`
 - `/admin/coupons`
+- `/admin/complaints`
 
 ## Instalacion
 
@@ -57,11 +58,11 @@ npm run db:seed
 npm run dev
 ```
 
-Usuario admin de prueba creado por seed:
+El seed solo crea o actualiza el usuario admin si defines `ADMIN_PASSWORD` en el entorno:
 
 ```text
 admin@danatto.com
-danatto123
+<valor de ADMIN_PASSWORD>
 ```
 
 ## Variables de entorno
@@ -85,8 +86,8 @@ MERCADO_PAGO_WEBHOOK_SECRET=""
 MERCADO_PAGO_NOTIFICATION_URL=""
 MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
 BLOB_READ_WRITE_TOKEN=""
-CULQI_PUBLIC_KEY=""
-CULQI_PRIVATE_KEY=""
+ORDER_RESERVATION_MINUTES="30"
+CRON_SECRET=""
 CLOUDINARY_CLOUD_NAME=""
 CLOUDINARY_UPLOAD_PRESET=""
 ```
@@ -106,12 +107,13 @@ El esquema esta en `prisma/schema.prisma` e incluye:
 - `OrderItem`
 - `Coupon`
 - `Banner`
+- `Complaint`
 
-Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y marca el producto como `vendido` si la unidad se agota.
+Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y reserva la prenda por una ventana temporal. Si Mercado Pago confirma el pago, el producto queda como `vendido`; si el pago falla o la reserva vence, el stock se libera automaticamente.
 
 ## Checkout con Shalom
 
-El checkout solicita nombres completos, telefono, DNI, provincia y distrito. Con esos datos consulta `/api/shalom/agencies`, muestra agencias Shalom del mismo distrito o, si no hay coincidencia exacta, ordena agencias de la misma provincia por distancia aproximada usando geocodificacion publica.
+El checkout solicita nombres completos, telefono, DNI, departamento, provincia y distrito cuando corresponde. En provincias con pocas sedes, el distrito es opcional y se muestran directamente las agencias disponibles. Con esos datos consulta `/api/shalom/agencies`, muestra agencias Shalom cercanas y, si hay geocodificacion disponible, las ordena por distancia aproximada.
 
 La base filtrada de agencias publicas esta en `src/lib/shalom-agencies.ts` y se genero desde la data publica de Shalom. Si actualizas la red de agencias, vuelve a regenerar ese archivo antes de desplegar.
 
@@ -126,12 +128,12 @@ La integracion usa Checkout Pro. El backend crea una preferencia de pago en `src
 Variables necesarias:
 
 ```env
-NEXT_PUBLIC_SITE_URL="https://danatto.vercel.app"
-MERCADO_PAGO_ENVIRONMENT="sandbox"
-MERCADO_PAGO_ACCESS_TOKEN="TEST-..."
-MERCADO_PAGO_PUBLIC_KEY="TEST-..."
+NEXT_PUBLIC_SITE_URL="https://danatto.com"
+MERCADO_PAGO_ENVIRONMENT="production"
+MERCADO_PAGO_ACCESS_TOKEN="APP_USR-..."
+MERCADO_PAGO_PUBLIC_KEY="APP_USR-..."
 MERCADO_PAGO_WEBHOOK_SECRET="..."
-MERCADO_PAGO_NOTIFICATION_URL="https://danatto.vercel.app/api/payments/mercado-pago/webhook"
+MERCADO_PAGO_NOTIFICATION_URL="https://danatto.com/api/payments/mercado-pago/webhook"
 MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
 ```
 
@@ -140,12 +142,12 @@ Para produccion cambia `MERCADO_PAGO_ENVIRONMENT` a `production` y usa las crede
 En Mercado Pago Developers configura el webhook de la aplicacion con evento `Pagos` apuntando a:
 
 ```text
-https://danatto.vercel.app/api/payments/mercado-pago/webhook
+https://danatto.com/api/payments/mercado-pago/webhook
 ```
 
-Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout devuelve modo `not_configured` para que la tienda siga siendo navegable sin cobrar. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado`; si llega rechazado o cancelado, lo marca como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
+Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout no permite generar cobros y libera la reserva del producto. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado` y marca la prenda como `vendido`; si llega rechazado o cancelado, libera stock y lo marca como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
 
-Culqi y Yape/Plin quedan como proveedores preparados para conectar con SDK/API real en una siguiente fase.
+La tarea programada `/api/cron/release-reservations` libera reservas vencidas. En Vercel se ejecuta cada 15 minutos desde `vercel.json`; configura `CRON_SECRET` para protegerla.
 
 ## Imagenes
 
@@ -154,6 +156,10 @@ El admin permite agregar varias imagenes por URL y tambien subir archivos desde 
 ## Pixeles
 
 `NEXT_PUBLIC_META_PIXEL_ID` y `NEXT_PUBLIC_TIKTOK_PIXEL_ID` estan listos para activar inicializacion desde `PixelBoot`. El codigo no inyecta scripts reales hasta que se definan IDs y se complete la politica de consentimiento.
+
+## Libro de reclamaciones
+
+La ruta publica `/complaints` permite registrar reclamos o quejas. El admin puede revisarlos y cambiar estado desde `/admin/complaints`.
 
 ## Marca y assets
 
@@ -177,11 +183,12 @@ Tambien se recomienda revisar manualmente:
 - `/shop`
 - `/product/camisa-oxford-ralph-lauren`
 - `/checkout`
+- `/complaints`
 - `/admin/login`
 
 ## Despliegue completo
 
-Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js desde Git en Vercel u otro hosting compatible con rutas server, middleware y API routes. Configura PostgreSQL real en `DATABASE_URL`, define `JWT_SECRET` y ejecuta las migraciones antes de operar la tienda.
+Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js desde Git en Vercel u otro hosting compatible con rutas server, middleware, API routes y cron jobs. Configura PostgreSQL real en `DATABASE_URL`, define `JWT_SECRET`, `CRON_SECRET`, Vercel Blob y Mercado Pago antes de operar la tienda.
 
 Comandos recomendados para produccion:
 
@@ -193,8 +200,7 @@ npm run build
 
 ## Notas de personalizacion
 
-- Cambiar imagenes demo por URLs propias o Cloudinary.
+- Cambiar imagenes iniciales por fotos propias desde el admin.
 - Ajustar colores en `tailwind.config.ts`.
 - Editar textos en las rutas de `src/app`.
-- Conectar pasarela real antes de produccion.
 - Revisar politicas legales con asesoria local antes de publicar.

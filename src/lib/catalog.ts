@@ -94,8 +94,13 @@ function filterSampleProducts(filters: CatalogFilters = {}) {
   return products;
 }
 
+function canUseSampleData() {
+  return process.env.NODE_ENV !== "production" && !process.env.DATABASE_URL;
+}
+
 export async function getProducts(filters: CatalogFilters = {}) {
-  if (!process.env.DATABASE_URL) return filterSampleProducts(filters);
+  if (canUseSampleData()) return filterSampleProducts(filters);
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     const where: Record<string, unknown> = {
@@ -143,14 +148,15 @@ export async function getProducts(filters: CatalogFilters = {}) {
     });
     return products.map((product) => serializeProduct(product as unknown as ProductWithRelations));
   } catch {
-    return filterSampleProducts(filters);
+    return process.env.NODE_ENV === "production" ? [] : filterSampleProducts(filters);
   }
 }
 
 export async function getProductBySlug(slug: string) {
-  if (!process.env.DATABASE_URL) {
+  if (canUseSampleData()) {
     return sampleProducts.find((product) => product.slug === slug) ?? null;
   }
+  if (!process.env.DATABASE_URL) return null;
 
   try {
     const product = await prisma.product.findUnique({
@@ -159,32 +165,35 @@ export async function getProductBySlug(slug: string) {
     });
     return product ? serializeProduct(product as unknown as ProductWithRelations) : null;
   } catch {
-    return sampleProducts.find((product) => product.slug === slug) ?? null;
+    return process.env.NODE_ENV === "production" ? null : sampleProducts.find((product) => product.slug === slug) ?? null;
   }
 }
 
 export async function getBrands() {
-  if (!process.env.DATABASE_URL) return sampleBrands;
+  if (canUseSampleData()) return sampleBrands;
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     return await prisma.brand.findMany({ orderBy: { name: "asc" } });
   } catch {
-    return sampleBrands;
+    return process.env.NODE_ENV === "production" ? [] : sampleBrands;
   }
 }
 
 export async function getCategories() {
-  if (!process.env.DATABASE_URL) return sampleCategories;
+  if (canUseSampleData()) return sampleCategories;
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     return await prisma.category.findMany({ orderBy: { name: "asc" } });
   } catch {
-    return sampleCategories;
+    return process.env.NODE_ENV === "production" ? [] : sampleCategories;
   }
 }
 
 export async function getAdminProducts() {
-  if (!process.env.DATABASE_URL) return sampleProducts;
+  if (canUseSampleData()) return sampleProducts;
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     const products = await prisma.product.findMany({
@@ -193,7 +202,7 @@ export async function getAdminProducts() {
     });
     return products.map((product) => serializeProduct(product as unknown as ProductWithRelations));
   } catch {
-    return sampleProducts;
+    return process.env.NODE_ENV === "production" ? [] : sampleProducts;
   }
 }
 

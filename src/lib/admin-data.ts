@@ -2,8 +2,12 @@ import { prisma } from "@/lib/db";
 import { getAdminProducts } from "@/lib/catalog";
 import { sampleBrands, sampleCategories, sampleProducts } from "@/lib/sample-data";
 
+function canUseSampleData() {
+  return process.env.NODE_ENV !== "production" && !process.env.DATABASE_URL;
+}
+
 export async function getDashboardStats() {
-  if (!process.env.DATABASE_URL) {
+  if (canUseSampleData()) {
     return {
       totalSales: 0,
       recentOrders: [],
@@ -11,6 +15,9 @@ export async function getDashboardStats() {
       sold: 0,
       lowStock: sampleProducts.filter((product) => product.stock <= 1).length
     };
+  }
+  if (!process.env.DATABASE_URL) {
+    return { totalSales: 0, recentOrders: [], available: 0, sold: 0, lowStock: 0 };
   }
 
   try {
@@ -23,6 +30,10 @@ export async function getDashboardStats() {
     const totalSales = orders.reduce((sum, order) => sum + Number(order.total), 0);
     return { totalSales, recentOrders: orders, available, sold, lowStock };
   } catch {
+    if (process.env.NODE_ENV === "production") {
+      return { totalSales: 0, recentOrders: [], available: 0, sold: 0, lowStock: 0 };
+    }
+
     return {
       totalSales: 0,
       recentOrders: [],
@@ -62,30 +73,32 @@ export async function getCustomers() {
 }
 
 export async function getBrandsAdmin() {
-  if (!process.env.DATABASE_URL) return sampleBrands;
+  if (canUseSampleData()) return sampleBrands;
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     return await prisma.brand.findMany({ orderBy: { name: "asc" } });
   } catch {
-    return sampleBrands;
+    return process.env.NODE_ENV === "production" ? [] : sampleBrands;
   }
 }
 
 export async function getCategoriesAdmin() {
-  if (!process.env.DATABASE_URL) return sampleCategories;
+  if (canUseSampleData()) return sampleCategories;
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     return await prisma.category.findMany({ orderBy: { name: "asc" } });
   } catch {
-    return sampleCategories;
+    return process.env.NODE_ENV === "production" ? [] : sampleCategories;
   }
 }
 
 export async function getBanners() {
-  if (!process.env.DATABASE_URL) {
+  if (canUseSampleData()) {
     return [
       {
-        id: "banner-demo",
+        id: "banner-sample",
         title: "Nuevos ingresos",
         subtitle: "Piezas seleccionadas cada semana",
         imageUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=85",
@@ -95,13 +108,15 @@ export async function getBanners() {
       }
     ];
   }
+  if (!process.env.DATABASE_URL) return [];
 
   try {
     return await prisma.banner.findMany({ orderBy: { title: "asc" } });
   } catch {
+    if (process.env.NODE_ENV === "production") return [];
     return [
       {
-        id: "banner-demo",
+        id: "banner-sample",
         title: "Nuevos ingresos",
         subtitle: "Piezas seleccionadas cada semana",
         imageUrl: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=85",
@@ -118,6 +133,16 @@ export async function getCoupons() {
 
   try {
     return await prisma.coupon.findMany({ orderBy: { code: "asc" } });
+  } catch {
+    return [];
+  }
+}
+
+export async function getComplaints() {
+  if (!process.env.DATABASE_URL) return [];
+
+  try {
+    return await prisma.complaint.findMany({ orderBy: { createdAt: "desc" } });
   } catch {
     return [];
   }

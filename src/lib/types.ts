@@ -79,6 +79,6 @@ export type CheckoutPayload = {
     email?: string;
   };
   shippingMethod: "shalom_agency";
-  paymentProvider: "mercado_pago" | "culqi" | "yape_plin";
+  paymentProvider: "mercado_pago";
   items: Array<{ productId: string; quantity: number }>;
 };

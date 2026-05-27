@@ -7,7 +7,8 @@ const policyLinks = [
   { href: "/policies/returns", label: "Cambios y devoluciones" },
   { href: "/policies/product-condition", label: "Estado de prendas" },
   { href: "/policies/terms", label: "Terminos y condiciones" },
-  { href: "/policies/privacy", label: "Privacidad" }
+  { href: "/policies/privacy", label: "Privacidad" },
+  { href: "/complaints", label: "Libro de reclamaciones" }
 ];
 
 export function Footer() {

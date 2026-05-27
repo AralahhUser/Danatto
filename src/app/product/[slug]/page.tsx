@@ -30,7 +30,7 @@ export default async function ProductPage({ params }: PageProps) {
   if (!product) notFound();
   const related = (await getProducts({ category: product.category.slug })).filter((item) => item.id !== product.id).slice(0, 4);
   const price = productPrice(product.price, product.salePrice);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.com";
   const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51912354180").replace(/\D/g, "");
   const whatsappMessage = encodeURIComponent(
     `Hola Danatto, quiero consultar por ${product.name} (${siteUrl}/product/${product.slug}).`

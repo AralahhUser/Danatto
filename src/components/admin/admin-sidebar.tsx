@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Boxes, Building2, Image, LayoutDashboard, LogOut, Package, Tags, Ticket, Users } from "lucide-react";
+import { BarChart3, Boxes, Building2, ClipboardList, Image, LayoutDashboard, LogOut, Package, Tags, Ticket, Users } from "lucide-react";
 import { clsx } from "clsx";
 import { Logo } from "@/components/site/logo";
 
@@ -14,7 +14,8 @@ const links = [
   { href: "/admin/brands", label: "Marcas", icon: Building2 },
   { href: "/admin/categories", label: "Categorias", icon: Tags },
   { href: "/admin/banners", label: "Banners", icon: Image },
-  { href: "/admin/coupons", label: "Cupones", icon: Ticket }
+  { href: "/admin/coupons", label: "Cupones", icon: Ticket },
+  { href: "/admin/complaints", label: "Reclamos", icon: ClipboardList }
 ];
 
 export function AdminSidebar() {

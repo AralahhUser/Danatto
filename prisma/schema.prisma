@@ -53,6 +53,11 @@ enum DiscountType {
   monto_fijo
 }
 
+enum ComplaintType {
+  reclamo
+  queja
+}
+
 model UserAdmin {
   id           String    @id @default(cuid())
   name         String
@@ -145,6 +150,7 @@ model Order {
   shippingStatus   ShippingStatus @default(pendiente)
   paymentProvider  String
   paymentReference String?
+  reservationExpiresAt DateTime?
   createdAt        DateTime       @default(now())
   customer         Customer       @relation(fields: [customerId], references: [id])
   items            OrderItem[]
@@ -183,4 +189,25 @@ model Banner {
   buttonText String?
   buttonLink String?
   active     Boolean @default(true)
+}
+
+model Complaint {
+  id          String        @id @default(cuid())
+  type        ComplaintType
+  fullName    String
+  document    String
+  email       String
+  phone       String
+  address     String?
+  orderNumber String?
+  amount      Decimal?      @db.Decimal(10, 2)
+  product     String
+  detail      String
+  request     String
+  status      String        @default("pendiente")
+  createdAt   DateTime      @default(now())
+
+  @@index([createdAt])
+  @@index([document])
+  @@index([status])
 }
