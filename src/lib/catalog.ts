@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/format";
+import { releaseExpiredReservations } from "@/lib/orders";
 import { sampleBrands, sampleCategories, sampleProducts } from "@/lib/sample-data";
 import type { Brand, Category, StoreProduct } from "@/lib/types";
 
@@ -103,6 +104,8 @@ export async function getProducts(filters: CatalogFilters = {}) {
   if (!process.env.DATABASE_URL) return [];
 
   try {
+    await releaseExpiredReservations();
+
     const where: Record<string, unknown> = {
       status: "disponible"
     };
@@ -159,6 +162,8 @@ export async function getProductBySlug(slug: string) {
   if (!process.env.DATABASE_URL) return null;
 
   try {
+    await releaseExpiredReservations();
+
     const product = await prisma.product.findUnique({
       where: { slug },
       include: { brand: true, category: true }

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validators";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { getShalomAgencyById, isShalomDistrictRequired, normalizeLocation } from "@/lib/shalom";
-import { getReservationExpiration, releaseOrderReservation } from "@/lib/orders";
+import { getReservationExpiration, releaseExpiredReservations, releaseOrderReservation } from "@/lib/orders";
 
 export async function POST(request: Request) {
   const parsed = checkoutSchema.safeParse(await request.json());
@@ -50,6 +50,8 @@ export async function POST(request: Request) {
   };
 
   try {
+    await releaseExpiredReservations();
+
     const result = await prisma.$transaction(async (tx) => {
       const ids = payload.items.map((item) => item.productId);
       const products = await tx.product.findMany({ where: { id: { in: ids } } });
