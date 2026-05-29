@@ -88,3 +88,24 @@ export const complaintSchema = z.object({
   detail: z.string().min(10),
   request: z.string().min(5)
 });
+
+export const adminPasswordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Ingresa tu contrasena actual"),
+    newPassword: z
+      .string()
+      .min(10, "La nueva contrasena debe tener al menos 10 caracteres")
+      .regex(/[a-z]/, "Incluye una minuscula")
+      .regex(/[A-Z]/, "Incluye una mayuscula")
+      .regex(/[0-9]/, "Incluye un numero")
+      .regex(/[^A-Za-z0-9]/, "Incluye un simbolo"),
+    confirmPassword: z.string().min(1, "Confirma la nueva contrasena")
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Las contrasenas no coinciden",
+    path: ["confirmPassword"]
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "La nueva contrasena debe ser distinta a la actual",
+    path: ["newPassword"]
+  });
