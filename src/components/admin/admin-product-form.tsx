@@ -17,26 +17,45 @@ export function AdminProductForm({
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [errorDetails, setErrorDetails] = useState<string[]>([]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
     setError("");
+    setErrorDetails([]);
     const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") || "");
+    const name = String(form.get("name") || "").trim();
+    const rawSlug = String(form.get("slug") || "").trim();
+    if (rawSlug && rawSlug.length < 3) {
+      setError("Revisa los datos del producto.");
+      setErrorDetails(["Slug: usa minimo 3 caracteres o dejalo vacio para generarlo automaticamente."]);
+      setSaving(false);
+      return;
+    }
+
+    const typedImages = String(form.get("images") || "")
+      .split(/\n|,/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const hasSelectedFiles = form.getAll("imageFiles").some((entry) => entry instanceof File && entry.size > 0);
+    if (!typedImages.length && !hasSelectedFiles) {
+      setError("Revisa los datos del producto.");
+      setErrorDetails(["Imagenes: sube al menos una imagen o pega una URL valida."]);
+      setSaving(false);
+      return;
+    }
+
     const uploadedImages = await uploadImages(form);
     if (!uploadedImages.ok) {
       setError(uploadedImages.error);
       setSaving(false);
       return;
     }
-    const typedImages = String(form.get("images") || "")
-      .split(/\n|,/)
-      .map((item) => item.trim())
-      .filter(Boolean);
+
     const payload = {
       name,
-      slug: String(form.get("slug") || slugify(name)),
+      slug: rawSlug || slugify(name),
       description: String(form.get("description") || ""),
       price: Number(form.get("price")),
       salePrice: form.get("salePrice") ? Number(form.get("salePrice")) : null,
@@ -71,6 +90,7 @@ export function AdminProductForm({
     if (!response.ok) {
       const data = await response.json();
       setError(data.error || "No se pudo guardar el producto.");
+      setErrorDetails(formatProductIssues(data.issues));
       setSaving(false);
       return;
     }
@@ -81,10 +101,21 @@ export function AdminProductForm({
 
   return (
     <form onSubmit={submit} className="grid gap-6 rounded-lg border border-ink/10 bg-white p-5">
-      {error ? <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+          <p className="font-semibold">{error}</p>
+          {errorDetails.length ? (
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {errorDetails.map((detail) => (
+                <li key={detail}>{detail}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
       <div className="grid gap-4 lg:grid-cols-2">
         <Field label="Nombre" name="name" defaultValue={product?.name} required />
-        <Field label="Slug" name="slug" defaultValue={product?.slug} />
+        <Field label="Slug" name="slug" defaultValue={product?.slug} hint="Opcional. Si lo dejas vacio se genera automaticamente." />
         <Field label="Precio" name="price" type="number" defaultValue={product?.price} required />
         <Field label="Precio oferta" name="salePrice" type="number" defaultValue={product?.salePrice ?? ""} />
         <label className="grid gap-2 text-sm">
@@ -199,13 +230,15 @@ function Field({
   name,
   type = "text",
   defaultValue,
-  required
+  required,
+  hint
 }: {
   label: string;
   name: string;
   type?: string;
   defaultValue?: string | number | null;
   required?: boolean;
+  hint?: string;
 }) {
   return (
     <label className="grid gap-2 text-sm">
@@ -217,6 +250,51 @@ function Field({
         required={required}
         className="rounded-md border border-ink/10 px-3 py-3"
       />
+      {hint ? <span className="text-xs text-ink/50">{hint}</span> : null}
     </label>
   );
+}
+
+const productFieldLabels: Record<string, string> = {
+  name: "Nombre",
+  slug: "Slug",
+  description: "Descripcion",
+  price: "Precio",
+  salePrice: "Precio oferta",
+  brandId: "Marca",
+  categoryId: "Categoria",
+  images: "Imagenes",
+  size: "Talla",
+  color: "Color",
+  gender: "Genero",
+  condition: "Estado de prenda",
+  stock: "Stock",
+  status: "Publicacion"
+};
+
+function formatProductIssues(issues: unknown) {
+  if (!issues || typeof issues !== "object") return [];
+  const details: string[] = [];
+  const flattened = issues as { fieldErrors?: Record<string, string[]>; formErrors?: string[] };
+
+  for (const message of flattened.formErrors || []) {
+    details.push(message);
+  }
+
+  for (const [field, messages] of Object.entries(flattened.fieldErrors || {})) {
+    for (const message of messages || []) {
+      details.push(`${productFieldLabels[field] || field}: ${translateIssue(message)}`);
+    }
+  }
+
+  return details;
+}
+
+function translateIssue(message: string) {
+  if (message.includes("String must contain at least 3")) return "debe tener al menos 3 caracteres.";
+  if (message.includes("String must contain at least 10")) return "debe tener al menos 10 caracteres.";
+  if (message.includes("Array must contain at least 1")) return "agrega al menos una imagen.";
+  if (message.includes("Invalid url")) return "usa una URL valida o sube una imagen desde tu equipo.";
+  if (message.includes("Number must be greater than 0")) return "debe ser mayor que 0.";
+  return message;
 }
