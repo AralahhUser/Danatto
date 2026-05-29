@@ -16,14 +16,14 @@ export function getReservationExpiration() {
 }
 
 export async function markOrderAsPaid(orderId: string, paymentReference?: string) {
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: { items: { include: { product: true } } }
     });
 
-    if (!order) return;
-    if (order.paymentStatus === "pagado") return;
+    if (!order) return false;
+    if (order.paymentStatus === "pagado") return false;
 
     const updated = await tx.order.updateMany({
       where: { id: order.id, paymentStatus: { in: ["pendiente", "fallido"] } },
@@ -34,10 +34,10 @@ export async function markOrderAsPaid(orderId: string, paymentReference?: string
       }
     });
 
-    if (updated.count !== 1) return;
+    if (updated.count !== 1) return false;
 
     for (const item of order.items as unknown as OrderItemForStock[]) {
-      if (item.product.status === "reservado" || item.product.stock <= 0) {
+      if (item.product.status === "reservado") {
         await tx.product.update({
           where: { id: item.product.id },
           data: { status: "vendido", stock: 0 }
@@ -51,8 +51,12 @@ export async function markOrderAsPaid(orderId: string, paymentReference?: string
             status: remaining <= 0 ? "vendido" : "disponible"
           }
         });
+      } else {
+        throw new Error("El pago fue confirmado, pero una prenda ya no esta disponible.");
       }
     }
+
+    return true;
   });
 }
 
@@ -77,17 +81,8 @@ export async function releaseOrderReservation(orderId: string, paymentReference?
 
     if (updated.count !== 1) return;
 
-    for (const item of order.items as unknown as OrderItemForStock[]) {
-      if (item.product.status === "reservado" || item.product.stock === 0) {
-        await tx.product.update({
-          where: { id: item.product.id },
-          data: {
-            stock: { increment: item.quantity },
-            status: "disponible"
-          }
-        });
-      }
-    }
+    // El checkout actual no descuenta stock antes del pago confirmado.
+    // Por eso un pedido fallido solo cambia de estado; no debe reabrir prendas vendidas.
   });
 }
 

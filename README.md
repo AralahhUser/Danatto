@@ -90,6 +90,10 @@ ORDER_RESERVATION_MINUTES="30"
 CRON_SECRET=""
 CLOUDINARY_CLOUD_NAME=""
 CLOUDINARY_UPLOAD_PRESET=""
+WHATSAPP_CLOUD_API_TOKEN=""
+WHATSAPP_PHONE_NUMBER_ID=""
+DANATTO_WHATSAPP_NOTIFY_TO="51912354180"
+WHATSAPP_API_VERSION="v22.0"
 ```
 
 No coloques claves reales en el repositorio.
@@ -109,7 +113,7 @@ El esquema esta en `prisma/schema.prisma` e incluye:
 - `Banner`
 - `Complaint`
 
-Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y reserva la prenda por una ventana temporal. Si Mercado Pago confirma el pago, el producto queda como `vendido`; si el pago falla o la reserva vence, el stock se libera automaticamente.
+Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y crea una ventana temporal de pago sin descontar stock ni ocultar la prenda. Si Mercado Pago confirma el pago, el producto queda como `vendido` y deja de mostrarse; si el pago falla o la ventana vence, solo se actualiza el estado del pedido.
 
 ## Checkout con Shalom
 
@@ -145,9 +149,22 @@ En Mercado Pago Developers configura el webhook de la aplicacion con evento `Pag
 https://danatto.com/api/payments/mercado-pago/webhook
 ```
 
-Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout no permite generar cobros y libera la reserva del producto. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado` y marca la prenda como `vendido`; si llega rechazado o cancelado, libera stock y lo marca como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
+Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout no permite generar cobros y marca el pedido como fallido. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado`, marca la prenda como `vendido` y dispara la notificacion de venta; si llega rechazado o cancelado, marca el pedido como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
 
-La tarea programada `/api/cron/release-reservations` libera reservas vencidas. En Vercel se ejecuta cada 15 minutos desde `vercel.json`; configura `CRON_SECRET` para protegerla.
+La tarea programada `/api/cron/release-reservations` cierra pedidos pendientes vencidos. En Vercel se ejecuta cada 15 minutos desde `vercel.json`; configura `CRON_SECRET` para protegerla.
+
+## WhatsApp operativo
+
+Despues de un pago aprobado, el webhook intenta enviar a WhatsApp los datos del cliente, agencia Shalom, pedido y la imagen publica de cada prenda comprada. La integracion usa WhatsApp Cloud API y requiere estas variables en Vercel:
+
+```env
+WHATSAPP_CLOUD_API_TOKEN="EAAG..."
+WHATSAPP_PHONE_NUMBER_ID="123456789"
+DANATTO_WHATSAPP_NOTIFY_TO="51912354180"
+WHATSAPP_API_VERSION="v22.0"
+```
+
+El numero destino debe poder recibir mensajes desde tu cuenta de WhatsApp Business/Cloud API. Las imagenes deben tener URL publica para que WhatsApp pueda adjuntarlas.
 
 ## Imagenes
 

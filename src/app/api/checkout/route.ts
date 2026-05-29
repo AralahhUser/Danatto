@@ -58,6 +58,21 @@ export async function POST(request: Request) {
       if (products.length !== payload.items.length) throw new Error("Uno o mas productos no existen.");
       const reservationExpiresAt = getReservationExpiration();
 
+      const activePendingItems = await tx.orderItem.findMany({
+        where: {
+          productId: { in: ids },
+          order: {
+            paymentStatus: "pendiente",
+            reservationExpiresAt: { gt: new Date() }
+          }
+        },
+        select: { productId: true }
+      });
+
+      if (activePendingItems.length > 0) {
+        throw new Error("Una prenda esta en proceso de pago. Intentalo nuevamente en unos minutos.");
+      }
+
       let subtotal = 0;
       for (const item of payload.items) {
         const product = products.find((entry) => entry.id === item.productId);
@@ -65,24 +80,6 @@ export async function POST(request: Request) {
           throw new Error("Una prenda ya no esta disponible.");
         }
         subtotal += Number(product.salePrice ?? product.price) * item.quantity;
-      }
-
-      for (const item of payload.items) {
-        const product = products.find((entry) => entry.id === item.productId)!;
-        const remaining = product.stock - item.quantity;
-        const reserved = await tx.product.updateMany({
-          where: {
-            id: product.id,
-            status: "disponible",
-            stock: { gte: item.quantity }
-          },
-          data: {
-            stock: { decrement: item.quantity },
-            status: remaining <= 0 ? "reservado" : product.status
-          }
-        });
-
-        if (reserved.count !== 1) throw new Error("Una prenda ya no esta disponible.");
       }
 
       const customer = await tx.customer.create({ data: customerData });
@@ -133,7 +130,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, orderId: result.orderId, payment });
   } catch (error) {
-    if (error instanceof Error && error.message.includes("disponible")) {
+    if (
+      error instanceof Error &&
+      (error.message.includes("disponible") || error.message.includes("proceso de pago"))
+    ) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
 

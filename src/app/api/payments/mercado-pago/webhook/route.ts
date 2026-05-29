@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getMercadoPagoPayment, mapMercadoPagoPaymentStatus } from "@/lib/payments";
 import { markOrderAsPaid, releaseOrderReservation } from "@/lib/orders";
+import { notifyDanattoPaidOrder } from "@/lib/whatsapp";
 
 export const runtime = "nodejs";
 
@@ -67,7 +68,13 @@ export async function POST(request: Request) {
     }
 
     if (mappedStatus === "pagado") {
-      await markOrderAsPaid(orderId, paymentReference);
+      const orderBecamePaid = await markOrderAsPaid(orderId, paymentReference);
+      if (orderBecamePaid) {
+        const notification = await notifyDanattoPaidOrder(orderId);
+        if (!notification.ok) {
+          console.error("Danatto WhatsApp notification was not delivered", notification);
+        }
+      }
     } else if (mappedStatus === "fallido") {
       await releaseOrderReservation(orderId, paymentReference);
     } else {
