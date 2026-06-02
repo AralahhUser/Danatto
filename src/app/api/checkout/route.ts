@@ -3,7 +3,13 @@ import { prisma } from "@/lib/db";
 import { checkoutSchema } from "@/lib/validators";
 import { createMercadoPagoPreference } from "@/lib/payments";
 import { getShalomAgencyById, isShalomDistrictRequired, normalizeLocation } from "@/lib/shalom";
-import { getReservationExpiration, releaseExpiredReservations, releaseOrderReservation } from "@/lib/orders";
+import {
+  getReservationExpiration,
+  manualPaymentReservationMinutes,
+  releaseExpiredReservations,
+  releaseOrderReservation
+} from "@/lib/orders";
+import type { CheckoutPayload } from "@/lib/types";
 
 export async function POST(request: Request) {
   const parsed = checkoutSchema.safeParse(await request.json());
@@ -56,7 +62,9 @@ export async function POST(request: Request) {
       const ids = payload.items.map((item) => item.productId);
       const products = await tx.product.findMany({ where: { id: { in: ids } } });
       if (products.length !== payload.items.length) throw new Error("Uno o mas productos no existen.");
-      const reservationExpiresAt = getReservationExpiration();
+      const reservationExpiresAt = getReservationExpiration(
+        isManualPaymentProvider(payload.paymentProvider) ? manualPaymentReservationMinutes : undefined
+      );
 
       const activePendingItems = await tx.orderItem.findMany({
         where: {
@@ -70,7 +78,7 @@ export async function POST(request: Request) {
       });
 
       if (activePendingItems.length > 0) {
-        throw new Error("Una prenda esta en proceso de pago. Intentalo nuevamente en unos minutos.");
+        throw new Error("Esta prenda tiene un pedido pendiente de pago. Intentalo nuevamente mas tarde.");
       }
 
       let subtotal = 0;
@@ -108,6 +116,20 @@ export async function POST(request: Request) {
       return { orderId: order.id, total: subtotal + shippingCost, reservationExpiresAt };
     });
 
+    if (isManualPaymentProvider(payload.paymentProvider)) {
+      return NextResponse.json({
+        ok: true,
+        orderId: result.orderId,
+        payment: buildManualPaymentResponse({
+          orderId: result.orderId,
+          total: result.total,
+          payload,
+          expiresAt: result.reservationExpiresAt,
+          shalomAgencyName: shalomAgency.name
+        })
+      });
+    }
+
     const payment = await createMercadoPagoPreference({
       orderId: result.orderId,
       total: result.total,
@@ -132,7 +154,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (
       error instanceof Error &&
-      (error.message.includes("disponible") || error.message.includes("proceso de pago"))
+      (error.message.includes("disponible") || error.message.includes("pendiente de pago"))
     ) {
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
@@ -140,4 +162,110 @@ export async function POST(request: Request) {
     console.error("Checkout error", error);
     return NextResponse.json({ error: "No se pudo registrar el pedido. Intentalo nuevamente." }, { status: 500 });
   }
+}
+
+type ManualPaymentProvider = Extract<CheckoutPayload["paymentProvider"], "manual_yape" | "manual_plin" | "bank_transfer">;
+
+function isManualPaymentProvider(provider: CheckoutPayload["paymentProvider"]): provider is ManualPaymentProvider {
+  return provider === "manual_yape" || provider === "manual_plin" || provider === "bank_transfer";
+}
+
+function buildManualPaymentResponse({
+  orderId,
+  total,
+  payload,
+  expiresAt,
+  shalomAgencyName
+}: {
+  orderId: string;
+  total: number;
+  payload: CheckoutPayload;
+  expiresAt: Date;
+  shalomAgencyName: string;
+}) {
+  const method = getManualPaymentMethod(payload.paymentProvider as ManualPaymentProvider);
+  const whatsappNumber = getPublicPhone(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51912354180");
+  const message = [
+    "Hola Danatto, deseo confirmar mi pedido.",
+    "",
+    `Pedido: ${orderId}`,
+    `Metodo de pago: ${method.label}`,
+    `Total: ${formatMoney(total)}`,
+    `Cliente: ${payload.customer.name}`,
+    `DNI: ${payload.customer.dni}`,
+    `Telefono: ${payload.customer.phone}`,
+    `Destino: ${payload.customer.department} / ${payload.customer.province}${payload.customer.district ? ` / ${payload.customer.district}` : ""}`,
+    `Agencia Shalom: ${shalomAgencyName}`,
+    "",
+    "Adjunto mi comprobante de pago."
+  ].join("\n");
+
+  return {
+    provider: payload.paymentProvider,
+    mode: "manual",
+    label: method.label,
+    title: method.title,
+    total,
+    expiresAt: expiresAt.toISOString(),
+    instructions: method.instructions,
+    qrUrl: method.qrUrl,
+    whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+  };
+}
+
+function getManualPaymentMethod(provider: ManualPaymentProvider) {
+  if (provider === "manual_plin") {
+    const number = getPublicPhone(process.env.NEXT_PUBLIC_PLIN_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51912354180");
+    return {
+      label: "Plin manual",
+      title: "Paga por Plin sin comision de pasarela",
+      qrUrl: process.env.NEXT_PUBLIC_PLIN_QR_URL || "",
+      instructions: [
+        { label: "Numero Plin", value: formatPeruPhone(number) },
+        { label: "Titular", value: process.env.NEXT_PUBLIC_PLIN_HOLDER || "Danatto" }
+      ]
+    };
+  }
+
+  if (provider === "bank_transfer") {
+    return {
+      label: "Transferencia bancaria",
+      title: "Transfiere directamente a Danatto",
+      qrUrl: "",
+      instructions: [
+        { label: "Banco", value: process.env.NEXT_PUBLIC_BANK_NAME || "Por confirmar" },
+        { label: "Cuenta", value: process.env.NEXT_PUBLIC_BANK_ACCOUNT || "Coordinar por WhatsApp" },
+        { label: "CCI", value: process.env.NEXT_PUBLIC_BANK_CCI || "Coordinar por WhatsApp" },
+        { label: "Titular", value: process.env.NEXT_PUBLIC_BANK_HOLDER || "Danatto" }
+      ]
+    };
+  }
+
+  const number = getPublicPhone(process.env.NEXT_PUBLIC_YAPE_NUMBER || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "51912354180");
+  return {
+    label: "Yape manual",
+    title: "Paga por Yape sin comision de pasarela",
+    qrUrl: process.env.NEXT_PUBLIC_YAPE_QR_URL || "",
+    instructions: [
+      { label: "Numero Yape", value: formatPeruPhone(number) },
+      { label: "Titular", value: process.env.NEXT_PUBLIC_YAPE_HOLDER || "Danatto" }
+    ]
+  };
+}
+
+function getPublicPhone(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function formatPeruPhone(value: string) {
+  const digits = getPublicPhone(value);
+  if (digits.startsWith("51") && digits.length === 11) {
+    return `+51 ${digits.slice(2, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
+  }
+
+  return digits;
+}
+
+function formatMoney(value: number) {
+  return `S/ ${value.toFixed(2)}`;
 }

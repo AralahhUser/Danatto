@@ -9,7 +9,7 @@ Tienda online premium para ropa americana seleccionada de segunda mano. Incluye 
 - Prisma ORM
 - PostgreSQL
 - Auth admin con cookie JWT
-- Pagos reales con Mercado Pago Checkout Pro
+- Pagos manuales sin comision de pasarela: Yape, Plin y transferencia
 - Imagenes optimizadas con `next/image`
 - Hosting pensado para Vercel
 
@@ -77,6 +77,16 @@ ADMIN_PASSWORD="change-this-before-production"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/danatto.store/"
 NEXT_PUBLIC_WHATSAPP_NUMBER="51912354180"
+NEXT_PUBLIC_YAPE_NUMBER="51912354180"
+NEXT_PUBLIC_YAPE_HOLDER="Danatto"
+NEXT_PUBLIC_YAPE_QR_URL=""
+NEXT_PUBLIC_PLIN_NUMBER="51912354180"
+NEXT_PUBLIC_PLIN_HOLDER="Danatto"
+NEXT_PUBLIC_PLIN_QR_URL=""
+NEXT_PUBLIC_BANK_NAME=""
+NEXT_PUBLIC_BANK_ACCOUNT=""
+NEXT_PUBLIC_BANK_CCI=""
+NEXT_PUBLIC_BANK_HOLDER="Danatto"
 NEXT_PUBLIC_META_PIXEL_ID=""
 NEXT_PUBLIC_TIKTOK_PIXEL_ID=""
 MERCADO_PAGO_ENVIRONMENT="sandbox"
@@ -88,6 +98,7 @@ MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
 MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"
 BLOB_READ_WRITE_TOKEN=""
 ORDER_RESERVATION_MINUTES="30"
+MANUAL_PAYMENT_WINDOW_MINUTES="1440"
 CRON_SECRET=""
 CLOUDINARY_CLOUD_NAME=""
 CLOUDINARY_UPLOAD_PRESET=""
@@ -114,7 +125,7 @@ El esquema esta en `prisma/schema.prisma` e incluye:
 - `Banner`
 - `Complaint`
 
-Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y crea una ventana temporal de pago sin descontar stock ni ocultar la prenda. Si Mercado Pago confirma el pago, el producto queda como `vendido` y deja de mostrarse; si el pago falla o la ventana vence, solo se actualiza el estado del pedido.
+Cuando un pedido se registra en `/api/checkout`, el sistema valida stock y crea una ventana temporal de pago sin descontar stock ni ocultar la prenda. En pagos manuales, el cliente recibe instrucciones para Yape, Plin o transferencia y envia el comprobante por WhatsApp. Cuando el admin marca el pedido como `pagado`, el producto queda como `vendido` y deja de mostrarse.
 
 ## Checkout con Shalom
 
@@ -122,9 +133,38 @@ El checkout solicita nombres completos, telefono, DNI, departamento, provincia y
 
 La base filtrada de agencias publicas esta en `src/lib/shalom-agencies.ts` y se genero desde la data publica de Shalom. Si actualizas la red de agencias, vuelve a regenerar ese archivo antes de desplegar.
 
-## Mercado Pago
+## Pagos manuales sin comision
 
-La integracion usa Checkout Pro. El backend crea una preferencia de pago en `src/lib/payments.ts`, redirige al cliente a Mercado Pago y recibe confirmaciones en:
+El checkout publico usa como metodo principal pagos manuales para evitar comisiones de pasarela:
+
+- `manual_yape`
+- `manual_plin`
+- `bank_transfer`
+
+Despues de crear el pedido, el cliente ve numero/QR/datos bancarios, total y un boton para enviar comprobante a WhatsApp. El producto se mantiene visible hasta que el admin valida el pago y cambia el pedido a `pagado`.
+
+Variables recomendadas en Vercel:
+
+```env
+NEXT_PUBLIC_WHATSAPP_NUMBER="51912354180"
+NEXT_PUBLIC_YAPE_NUMBER="51912354180"
+NEXT_PUBLIC_YAPE_HOLDER="Danatto"
+NEXT_PUBLIC_YAPE_QR_URL="https://..."
+NEXT_PUBLIC_PLIN_NUMBER="51912354180"
+NEXT_PUBLIC_PLIN_HOLDER="Danatto"
+NEXT_PUBLIC_PLIN_QR_URL="https://..."
+NEXT_PUBLIC_BANK_NAME="BCP"
+NEXT_PUBLIC_BANK_ACCOUNT="..."
+NEXT_PUBLIC_BANK_CCI="..."
+NEXT_PUBLIC_BANK_HOLDER="Danatto"
+MANUAL_PAYMENT_WINDOW_MINUTES="1440"
+```
+
+`MANUAL_PAYMENT_WINDOW_MINUTES` define cuanto tiempo queda el pedido pendiente antes de cerrarse automaticamente si no se confirma. Por defecto son 1440 minutos.
+
+## Mercado Pago opcional
+
+La integracion con Checkout Pro se mantiene como soporte secundario en backend. Si vuelves a usarla, el backend crea una preferencia de pago en `src/lib/payments.ts`, redirige al cliente a Mercado Pago y recibe confirmaciones en:
 
 ```text
 /api/payments/mercado-pago/webhook
@@ -143,7 +183,7 @@ MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
 MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"
 ```
 
-Para produccion cambia `MERCADO_PAGO_ENVIRONMENT` a `production` y usa las credenciales productivas. No coloques claves reales en el repositorio; configuralas en `.env.local` para pruebas privadas o en Environment Variables de Vercel.
+Para produccion cambia `MERCADO_PAGO_ENVIRONMENT` a `production` y usa las credenciales productivas solo si decides volver a habilitar Mercado Pago. No coloques claves reales en el repositorio; configuralas en `.env.local` para pruebas privadas o en Environment Variables de Vercel.
 
 Danatto excluye Yape del Checkout Pro automatico mediante `MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"`. Si necesitas excluir mas medios de pago, agrega sus ids separados por coma.
 
@@ -153,13 +193,13 @@ En Mercado Pago Developers configura el webhook de la aplicacion con evento `Pag
 https://danatto.com/api/payments/mercado-pago/webhook
 ```
 
-Si `MERCADO_PAGO_ACCESS_TOKEN` no existe, el checkout no permite generar cobros y marca el pedido como fallido. Si el webhook recibe un pago aprobado, actualiza el pedido a `pagado`, marca la prenda como `vendido` y dispara la notificacion de venta; si llega rechazado o cancelado, marca el pedido como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
+Si el webhook recibe un pago aprobado de Mercado Pago, actualiza el pedido a `pagado`, marca la prenda como `vendido` y dispara la notificacion de venta; si llega rechazado o cancelado, marca el pedido como `fallido`; si llega reembolsado, lo marca como `reembolsado`.
 
 La tarea programada `/api/cron/release-reservations` cierra pedidos pendientes vencidos. En Vercel se ejecuta cada 15 minutos desde `vercel.json`; configura `CRON_SECRET` para protegerla.
 
 ## WhatsApp operativo
 
-Despues de un pago aprobado, el webhook intenta enviar a WhatsApp los datos del cliente, agencia Shalom, pedido y la imagen publica de cada prenda comprada. La integracion usa WhatsApp Cloud API y requiere estas variables en Vercel:
+Despues de un pago aprobado, sea por webhook de Mercado Pago o por confirmacion manual desde el admin, el sistema intenta enviar a WhatsApp los datos del cliente, agencia Shalom, pedido y la imagen publica de cada prenda comprada. La integracion usa WhatsApp Cloud API y requiere estas variables en Vercel:
 
 ```env
 WHATSAPP_CLOUD_API_TOKEN="EAAG..."
@@ -209,7 +249,7 @@ Tambien se recomienda revisar manualmente:
 
 ## Despliegue completo
 
-Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js desde Git en Vercel u otro hosting compatible con rutas server, middleware, API routes y cron jobs. Configura PostgreSQL real en `DATABASE_URL`, define `JWT_SECRET`, `CRON_SECRET`, Vercel Blob y Mercado Pago antes de operar la tienda.
+Para usar el 100% de la funcionalidad, despliega la app como proyecto Next.js desde Git en Vercel u otro hosting compatible con rutas server, middleware, API routes y cron jobs. Configura PostgreSQL real en `DATABASE_URL`, define `JWT_SECRET`, `CRON_SECRET`, Vercel Blob y los datos publicos de pago manual antes de operar la tienda.
 
 Comandos recomendados para produccion:
 

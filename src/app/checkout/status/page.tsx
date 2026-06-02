@@ -13,14 +13,14 @@ const statusCopy = {
     icon: CheckCircle2,
     eyebrow: "Pago aprobado",
     title: "Gracias por tu compra",
-    body: "Recibimos la confirmacion de Mercado Pago. Prepararemos tu pedido para enviarlo a la agencia Shalom seleccionada.",
+    body: "Recibimos la confirmacion del pago. Prepararemos tu pedido para enviarlo a la agencia Shalom seleccionada.",
     className: "bg-olive/10 text-olive"
   },
   pending: {
     icon: Clock3,
     eyebrow: "Pago pendiente",
     title: "Tu pedido esta en revision",
-    body: "Mercado Pago aun esta procesando la operacion. Actualizaremos el pedido cuando llegue la confirmacion.",
+    body: "El pago aun esta pendiente de validacion. Actualizaremos el pedido cuando llegue la confirmacion.",
     className: "bg-champagne/15 text-ink"
   },
   failure: {

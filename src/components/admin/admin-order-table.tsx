@@ -60,7 +60,7 @@ export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="grid gap-2">
-                    <span className="text-xs text-ink/45">{order.paymentProvider}</span>
+                    <span className="text-xs text-ink/45">{paymentProviderLabel(order.paymentProvider)}</span>
                     <select
                       defaultValue={order.paymentStatus}
                       onChange={(event) => update(order.id, "paymentStatus", event.target.value)}
@@ -106,4 +106,15 @@ export function AdminOrderTable({ orders }: { orders: OrderRow[] }) {
       </div>
     </div>
   );
+}
+
+function paymentProviderLabel(provider: string) {
+  const labels: Record<string, string> = {
+    manual_yape: "Yape manual",
+    manual_plin: "Plin manual",
+    bank_transfer: "Transferencia",
+    mercado_pago: "Mercado Pago"
+  };
+
+  return labels[provider] || provider;
 }

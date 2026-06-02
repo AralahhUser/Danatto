@@ -10,9 +10,10 @@ type OrderItemForStock = {
 };
 
 export const orderReservationMinutes = Number(process.env.ORDER_RESERVATION_MINUTES || 30);
+export const manualPaymentReservationMinutes = Number(process.env.MANUAL_PAYMENT_WINDOW_MINUTES || 1440);
 
-export function getReservationExpiration() {
-  return new Date(Date.now() + orderReservationMinutes * 60 * 1000);
+export function getReservationExpiration(minutes = orderReservationMinutes) {
+  return new Date(Date.now() + minutes * 60 * 1000);
 }
 
 export async function markOrderAsPaid(orderId: string, paymentReference?: string) {

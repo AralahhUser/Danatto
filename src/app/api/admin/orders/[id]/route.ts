@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { markOrderAsPaid, releaseOrderReservation } from "@/lib/orders";
+import { notifyDanattoPaidOrder } from "@/lib/whatsapp";
 
 const orderUpdateSchema = z.object({
   paymentStatus: z.enum(["pendiente", "pagado", "fallido", "reembolsado"]).optional(),
@@ -18,7 +19,13 @@ export async function PATCH(request: Request, { params }: Params) {
     const { paymentStatus, shippingStatus } = parsed.data;
 
     if (paymentStatus === "pagado") {
-      await markOrderAsPaid(id);
+      const orderBecamePaid = await markOrderAsPaid(id);
+      if (orderBecamePaid) {
+        const notification = await notifyDanattoPaidOrder(id);
+        if (!notification.ok) {
+          console.error("Danatto WhatsApp notification was not delivered", notification);
+        }
+      }
     } else if (paymentStatus === "fallido") {
       await releaseOrderReservation(id);
     } else if (paymentStatus) {

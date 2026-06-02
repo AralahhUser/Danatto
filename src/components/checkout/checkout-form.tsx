@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, MapPin } from "lucide-react";
+import { CheckCircle2, Landmark, MapPin, MessageCircle, Smartphone } from "lucide-react";
 import { useCart } from "@/components/cart/cart-provider";
 import { formatCurrency } from "@/lib/format";
 import {
@@ -14,10 +14,55 @@ import {
   type ShalomAgencyOption
 } from "@/lib/shalom";
 
+type ManualPaymentProvider = "manual_yape" | "manual_plin" | "bank_transfer";
+
+type ManualPaymentResult = {
+  orderId: string;
+  payment: {
+    mode: "manual";
+    provider: ManualPaymentProvider;
+    label: string;
+    title: string;
+    total: number;
+    expiresAt: string;
+    qrUrl?: string;
+    whatsappUrl: string;
+    instructions: Array<{ label: string; value: string }>;
+  };
+};
+
+const paymentOptions: Array<{
+  value: ManualPaymentProvider;
+  label: string;
+  description: string;
+  icon: typeof Smartphone;
+}> = [
+  {
+    value: "manual_yape",
+    label: "Yape manual",
+    description: "Paga directo y envia tu comprobante por WhatsApp.",
+    icon: Smartphone
+  },
+  {
+    value: "manual_plin",
+    label: "Plin manual",
+    description: "Transferencia directa sin comision de pasarela.",
+    icon: Smartphone
+  },
+  {
+    value: "bank_transfer",
+    label: "Transferencia",
+    description: "Usa cuenta bancaria y confirma por WhatsApp.",
+    icon: Landmark
+  }
+];
+
 export function CheckoutForm() {
   const { items, subtotal, clear } = useCart();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [paymentProvider, setPaymentProvider] = useState<ManualPaymentProvider>("manual_yape");
+  const [manualPayment, setManualPayment] = useState<ManualPaymentResult | null>(null);
   const [department, setDepartment] = useState("");
   const [province, setProvince] = useState("");
   const [district, setDistrict] = useState("");
@@ -99,7 +144,7 @@ export function CheckoutForm() {
         shalomAgencyId: selectedAgency.id
       },
       shippingMethod: "shalom_agency",
-      paymentProvider: form.get("paymentProvider"),
+      paymentProvider: String(form.get("paymentProvider") || paymentProvider),
       items: items.map((item) => ({ productId: item.productId, quantity: item.quantity }))
     };
 
@@ -118,17 +163,29 @@ export function CheckoutForm() {
 
     const mercadoPagoUrl = data.payment?.initPoint || data.payment?.init_point;
 
+    if (data.payment?.mode === "manual") {
+      setManualPayment({ orderId: data.orderId, payment: data.payment });
+      setStatus("success");
+      setMessage("Pedido creado. Completa el pago manual y envia tu comprobante por WhatsApp.");
+      clear();
+      return;
+    }
+
     setStatus("success");
     setMessage(
       mercadoPagoUrl
-        ? "Pedido creado. Te estamos llevando a Mercado Pago."
-        : "Pedido creado. La pasarela queda lista al configurar las variables de entorno."
+        ? "Pedido creado. Te estamos llevando a la pasarela de pago."
+        : "Pedido creado. Te enviaremos las instrucciones de pago."
     );
     clear();
 
     if (mercadoPagoUrl) {
       window.location.assign(mercadoPagoUrl);
     }
+  }
+
+  if (status === "success" && manualPayment) {
+    return <ManualPaymentConfirmation result={manualPayment} />;
   }
 
   if (!items.length && status !== "success") {
@@ -361,11 +418,47 @@ export function CheckoutForm() {
 
         <section className="mobile-card rounded-lg border border-ink/10 bg-white p-4 sm:p-6 md:bg-white">
           <h2 className="text-base font-semibold sm:text-lg">Metodo de pago</h2>
-          <div className="mt-5 grid gap-4">
-            <label className="flex min-h-14 items-center rounded-lg border border-ink/10 p-4 text-sm sm:text-base">
-              <input defaultChecked type="radio" name="paymentProvider" value="mercado_pago" className="mr-2" />
-              Mercado Pago
-            </label>
+          <p className="mt-1 text-sm leading-6 text-ink/60">
+            Estos metodos evitan comisiones de pasarela. Validaremos el comprobante antes de preparar el envio.
+          </p>
+          <div className="mt-5 grid gap-3">
+            {paymentOptions.map((option) => {
+              const Icon = option.icon;
+              const selected = paymentProvider === option.value;
+
+              return (
+                <label
+                  key={option.value}
+                  className={`flex min-h-16 cursor-pointer items-center gap-3 rounded-lg border p-4 text-sm transition sm:text-base ${
+                    selected ? "border-ink bg-ink text-white" : "border-ink/10 bg-white hover:border-ink/35"
+                  }`}
+                >
+                  <input
+                    required
+                    type="radio"
+                    name="paymentProvider"
+                    value={option.value}
+                    checked={selected}
+                    onChange={() => setPaymentProvider(option.value)}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`grid h-10 w-10 shrink-0 place-items-center rounded-full border ${
+                      selected ? "border-white/20 bg-white/10 text-white" : "border-ink/10 bg-linen text-ink"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{option.label}</span>
+                    <span className={`mt-1 block text-sm ${selected ? "text-white/70" : "text-ink/55"}`}>
+                      {option.description}
+                    </span>
+                  </span>
+                  {selected ? <CheckCircle2 className="ml-auto h-5 w-5 shrink-0" /> : null}
+                </label>
+              );
+            })}
           </div>
         </section>
       </div>
@@ -435,5 +528,99 @@ export function CheckoutForm() {
         </div>
       ) : null}
     </form>
+  );
+}
+
+function ManualPaymentConfirmation({ result }: { result: ManualPaymentResult }) {
+  const expiration = new Date(result.payment.expiresAt);
+  const expirationText = Number.isNaN(expiration.getTime())
+    ? ""
+    : expiration.toLocaleString("es-PE", {
+        dateStyle: "short",
+        timeStyle: "short"
+      });
+
+  return (
+    <div className="grid gap-5 pb-12 lg:grid-cols-[1fr_360px] lg:gap-8">
+      <section className="mobile-card rounded-lg border border-ink/10 bg-white p-5 sm:p-8 md:bg-white">
+        <span className="mobile-primary grid h-12 w-12 place-items-center rounded-full bg-ink text-white">
+          <CheckCircle2 className="h-6 w-6" />
+        </span>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-olive">Pedido registrado</p>
+        <h2 className="mt-3 text-3xl font-semibold leading-tight sm:text-4xl">Completa tu pago manual</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/65 sm:text-base">
+          Tu pedido quedo pendiente de validacion. La prenda se marcara como vendida cuando confirmemos el pago.
+        </p>
+
+        <div className="mobile-soft-surface mt-6 rounded-lg bg-linen/60 p-4">
+          <p className="text-sm font-semibold text-ink">Pedido</p>
+          <p className="mt-1 break-all text-sm text-ink/60">{result.orderId}</p>
+          {expirationText ? (
+            <p className="mt-3 text-sm text-ink/60">
+              Tiempo para enviar comprobante: <span className="font-semibold text-ink">{expirationText}</span>
+            </p>
+          ) : null}
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-[220px_1fr]">
+          <div className="mobile-soft-surface grid min-h-[220px] place-items-center rounded-lg border border-ink/10 bg-linen/40 p-4">
+            {result.payment.qrUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={result.payment.qrUrl} alt={`QR ${result.payment.label}`} className="max-h-52 w-full object-contain" />
+            ) : (
+              <div className="text-center">
+                <Smartphone className="mx-auto h-10 w-10 text-ink/55" />
+                <p className="mt-3 text-sm font-semibold">{result.payment.label}</p>
+                <p className="mt-1 text-xs leading-5 text-ink/55">Usa los datos de pago indicados.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-lg border border-ink/10 bg-white p-4">
+            <p className="text-sm font-semibold">{result.payment.title}</p>
+            <div className="mt-4 grid gap-3 text-sm">
+              {result.payment.instructions.map((item) => (
+                <div key={item.label} className="flex justify-between gap-4 border-b border-ink/10 pb-3 last:border-0 last:pb-0">
+                  <span className="text-ink/55">{item.label}</span>
+                  <span className="text-right font-semibold">{item.value}</span>
+                </div>
+              ))}
+              <div className="flex justify-between gap-4 pt-1 text-base">
+                <span className="font-semibold">Total</span>
+                <span className="font-semibold">{formatCurrency(result.payment.total)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <a
+            href={result.payment.whatsappUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mobile-primary inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white md:bg-ink md:text-white"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Enviar comprobante
+          </a>
+          <Link
+            href="/shop"
+            className="mobile-outline inline-flex min-h-12 items-center justify-center rounded-full border border-ink/10 px-5 py-3 text-sm font-semibold text-ink"
+          >
+            Volver a tienda
+          </Link>
+        </div>
+      </section>
+
+      <aside className="mobile-card h-fit rounded-lg border border-ink/10 bg-white p-5 sm:p-6 md:bg-white">
+        <h3 className="text-lg font-semibold">Como se confirma</h3>
+        <div className="mt-4 grid gap-4 text-sm leading-6 text-ink/65">
+          <p>1. Realiza el pago por el metodo elegido.</p>
+          <p>2. Presiona "Enviar comprobante" y adjunta la captura por WhatsApp.</p>
+          <p>3. Danatto valida el pago y marca el pedido como pagado desde el panel admin.</p>
+          <p>4. La prenda pasa a vendida y se prepara el envio a Shalom.</p>
+        </div>
+      </aside>
+    </div>
   );
 }

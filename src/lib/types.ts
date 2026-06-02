@@ -79,6 +79,6 @@ export type CheckoutPayload = {
     email?: string;
   };
   shippingMethod: "shalom_agency";
-  paymentProvider: "mercado_pago";
+  paymentProvider: "manual_yape" | "manual_plin" | "bank_transfer" | "mercado_pago";
   items: Array<{ productId: string; quantity: number }>;
 };

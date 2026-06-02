@@ -40,7 +40,7 @@ export const checkoutSchema = z.object({
     shalomAgencyId: z.string().min(1)
   }),
   shippingMethod: z.enum(["shalom_agency"]),
-  paymentProvider: z.enum(["mercado_pago"]),
+  paymentProvider: z.enum(["manual_yape", "manual_plin", "bank_transfer", "mercado_pago"]),
   items: z.array(z.object({ productId: z.string(), quantity: z.number().int().positive() })).min(1)
 });
 
