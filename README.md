@@ -85,6 +85,7 @@ MERCADO_PAGO_PUBLIC_KEY=""
 MERCADO_PAGO_WEBHOOK_SECRET=""
 MERCADO_PAGO_NOTIFICATION_URL=""
 MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
+MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"
 BLOB_READ_WRITE_TOKEN=""
 ORDER_RESERVATION_MINUTES="30"
 CRON_SECRET=""
@@ -139,9 +140,12 @@ MERCADO_PAGO_PUBLIC_KEY="APP_USR-..."
 MERCADO_PAGO_WEBHOOK_SECRET="..."
 MERCADO_PAGO_NOTIFICATION_URL="https://danatto.com/api/payments/mercado-pago/webhook"
 MERCADO_PAGO_STATEMENT_DESCRIPTOR="DANATTO"
+MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"
 ```
 
 Para produccion cambia `MERCADO_PAGO_ENVIRONMENT` a `production` y usa las credenciales productivas. No coloques claves reales en el repositorio; configuralas en `.env.local` para pruebas privadas o en Environment Variables de Vercel.
+
+Danatto excluye Yape del Checkout Pro automatico mediante `MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS="yape"`. Si necesitas excluir mas medios de pago, agrega sus ids separados por coma.
 
 En Mercado Pago Developers configura el webhook de la aplicacion con evento `Pagos` apuntando a:
 

@@ -33,6 +33,7 @@ export async function createMercadoPagoPreference({
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   const siteUrl = getSiteUrl();
   const environment = process.env.MERCADO_PAGO_ENVIRONMENT === "production" ? "production" : "sandbox";
+  const excludedPaymentMethodIds = getExcludedPaymentMethodIds();
 
   if (!accessToken) {
     return {
@@ -81,6 +82,13 @@ export async function createMercadoPagoPreference({
             expires: true,
             expiration_date_from: new Date().toISOString(),
             expiration_date_to: expiresAt.toISOString()
+          }
+        : {}),
+      ...(excludedPaymentMethodIds.length
+        ? {
+            payment_methods: {
+              excluded_payment_methods: excludedPaymentMethodIds.map((id) => ({ id }))
+            }
           }
         : {}),
       notification_url: notificationUrl,
@@ -141,4 +149,13 @@ export function mapMercadoPagoPaymentStatus(status?: string): "pendiente" | "pag
 
 function getSiteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://danatto.com").replace(/\/$/, "");
+}
+
+function getExcludedPaymentMethodIds() {
+  const raw = process.env.MERCADO_PAGO_EXCLUDED_PAYMENT_METHODS?.trim() || "yape";
+
+  return raw
+    .split(",")
+    .map((method) => method.trim().toLowerCase())
+    .filter(Boolean);
 }
